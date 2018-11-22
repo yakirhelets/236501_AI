@@ -58,9 +58,13 @@ class MapProblem(GraphProblem):
             successor_state = MapState(link.target)
 
             # TODO: calculate the distance between `junction` and the successor's junction.
+
+            successors_junction = self.roads[link.target]
+
+            dist = junction.calc_air_distance_from(successors_junction)
             # Use the method `calc_air_distance_from()` of class `Junction` to measure this distance.
             # Do NOT use `link.distance` here.
-            operator_cost = 1  # TODO: modify this!
+            operator_cost = dist  # TODO: modify this!
 
             # Yield the successor state and the cost of the operator we used to get this successor.
             yield successor_state, operator_cost
@@ -73,4 +77,8 @@ class MapProblem(GraphProblem):
 
         # TODO: modify the returned value to indicate whether `state` is a final state.
         # You may use the problem's input parameters (stored as fields of this object by the constructor).
-        return state.junction_id == 14593
+
+        if self.target_junction_id == state.junction_id:
+            return True
+        else:
+            return False
