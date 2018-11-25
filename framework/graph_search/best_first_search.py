@@ -124,7 +124,6 @@ class BestFirstSearch(GraphProblemSolver):
                 if next_node_to_expand is None:
                     break
 
-                # TODO: is it correct to increment here? maybe should be after the `is_goal` check?
                 nr_expanded_states += 1
 
                 if problem.is_goal(next_node_to_expand.state):
