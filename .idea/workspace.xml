@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="73df41b1-e3cb-4fcf-acaa-ede0280aa216" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HW1.docx" beforeDir="false" afterPath="$PROJECT_DIR$/HW1.docx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deliveries/map_problem.py" beforeDir="false" afterPath="$PROJECT_DIR$/deliveries/map_problem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py" beforeDir="false" afterPath="$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deliveries/deliveries_heuristics.py" beforeDir="false" afterPath="$PROJECT_DIR$/deliveries/deliveries_heuristics.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,24 +28,24 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="50" />
+          <entry key="py" value="52" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="50" />
+          <entry key="Python" value="52" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="3694" />
-          <entry key="txt" value="76" />
+          <entry key="py" value="4121" />
+          <entry key="txt" value="82" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="76" />
-          <entry key="Python" value="3694" />
+          <entry key="PLAIN_TEXT" value="82" />
+          <entry key="Python" value="4121" />
         </counts>
       </usages-collector>
     </session>
@@ -68,10 +66,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py">
+        <entry file="file://$PROJECT_DIR$/deliveries/deliveries_heuristics.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="473">
-              <caret line="144" lean-forward="true" selection-start-line="144" selection-end-line="144" />
+            <state relative-caret-position="381">
+              <caret line="33" column="21" lean-forward="true" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -80,10 +78,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/deliveries/map_problem.py">
+        <entry file="file://$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="358">
-              <caret line="63" column="39" selection-start-line="63" selection-start-column="31" selection-end-line="63" selection-end-column="39" />
+            <state relative-caret-position="1228">
+              <caret line="83" column="33" selection-start-line="83" selection-start-column="13" selection-end-line="83" selection-end-column="33" />
               <folding>
                 <element signature="e#0#36#0" expanded="true" />
               </folding>
@@ -111,6 +109,7 @@
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/deliveries/map_problem.py" />
         <option value="$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py" />
+        <option value="$PROJECT_DIR$/deliveries/deliveries_heuristics.py" />
       </list>
     </option>
   </component>
@@ -259,7 +258,21 @@
       <option name="project" value="LOCAL" />
       <updated>1543133740059</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Finish Section F q13">
+      <created>1543164712997</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1543164712997</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Finish Section F q14">
+      <created>1543167052025</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1543167052025</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -271,7 +284,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.19562043" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.19562043" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -326,7 +339,9 @@
     <MESSAGE value="Finish Section E, q11" />
     <MESSAGE value="Finish Section E, q12 - code only" />
     <MESSAGE value="Finish Section E" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finish Section E" />
+    <MESSAGE value="Finish Section F q13" />
+    <MESSAGE value="Finish Section F q14" />
+    <option name="LAST_COMMIT_MESSAGE" value="Finish Section F q14" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/deliveries/__init__.py">
@@ -363,16 +378,6 @@
           <caret line="25" column="34" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="34" />
           <folding>
             <element signature="e#0#38#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/deliveries/deliveries_heuristics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="58" selection-start-line="14" selection-start-column="58" selection-end-line="14" selection-end-column="58" />
-          <folding>
-            <element signature="e#0#36#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -464,8 +469,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/deliveries/relaxed_deliveries_problem.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="144" lean-forward="true" selection-start-line="144" selection-end-line="144" />
+        <state relative-caret-position="1228">
+          <caret line="83" column="33" selection-start-line="83" selection-start-column="13" selection-end-line="83" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#36#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/deliveries/deliveries_heuristics.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="33" column="21" lean-forward="true" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
           <folding>
             <element signature="e#0#36#0" expanded="true" />
           </folding>

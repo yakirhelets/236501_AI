@@ -16,13 +16,22 @@ class MaxAirDistHeuristic(HeuristicFunction):
         """
         Calculates the maximum among air distances between the location
          represented by `state` and the locations of the waiting deliveries.
-        TODO: implement this method!
         """
         assert isinstance(self.problem, RelaxedDeliveriesProblem)
         assert isinstance(state, RelaxedDeliveriesState)
 
-        raise NotImplemented()  # TODO: remove!
+        result = 0.0
 
+        # Set of all drop points minus set of dropped so far
+        delivery_junctions_remaining = self.problem.drop_points.difference(state.dropped_so_far)
+        current_junction = state.current_location
+
+        for i in delivery_junctions_remaining:
+            distance = i.calc_air_distance_from(current_junction)
+            if distance > result:
+                result = distance
+
+        return result
 
 class MSTAirDistHeuristic(HeuristicFunction):
     heuristic_name = 'MSTAirDist'
