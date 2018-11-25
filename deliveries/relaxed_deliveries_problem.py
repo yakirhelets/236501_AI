@@ -36,24 +36,26 @@ class RelaxedDeliveriesState(GraphProblemState):
         """
         This method is used to determine whether two given state objects represents the same state.
 
-        TODO: implement this method!
         Notice: Never compare floats using `==` operator! Use `fuel_as_int` instead of `fuel`.
         """
-        raise NotImplemented()  # TODO: remove!
+        same_junction = self.current_location.__eq__(other.current_location)
+        same_orders_delivered = self.dropped_so_far.__eq__(other.dropped_so_far)
+        same_fuel_amount = self.fuel_as_int == other.fuel_as_int
+
+        return same_junction & same_orders_delivered & same_fuel_amount
 
     def __hash__(self):
         """
         This method is used to create a hash of a state.
         It is critical that two objects representing the same state would have the same hash!
 
-        TODO: implement this method!
         A common implementation might be something in the format of:
         >>> return hash((self.some_field1, self.some_field2, self.some_field3))
         Notice: Do NOT give float fields to `hash(...)`.
                 Otherwise the upper requirement would not met.
                 In our case, use `fuel_as_int`.
         """
-        raise NotImplemented()  # TODO: remove!
+        return hash((self.current_location, self.fuel_as_int, self.dropped_so_far))
 
     def __str__(self):
         """
@@ -83,7 +85,6 @@ class RelaxedDeliveriesProblem(GraphProblem):
 
     def expand_state_with_costs(self, state_to_expand: GraphProblemState) -> Iterator[Tuple[GraphProblemState, float]]:
         """
-        TODO: implement this method!
         This method represents the `Succ: S -> P(S)` function of the relaxed deliveries problem.
         The `Succ` function is defined by the problem operators as shown in class.
         The relaxed problem operators are defined in the assignment instructions.
@@ -93,16 +94,55 @@ class RelaxedDeliveriesProblem(GraphProblem):
         """
         assert isinstance(state_to_expand, RelaxedDeliveriesState)
 
-        raise NotImplemented()  # TODO: remove!
+        # Get the junction (in the map) that is represented by the state to expand.
+        junction = state_to_expand.current_location
+
+        # Iterate over the outgoing roads of the current junction.
+        for link in junction.links:
+
+            fuel_left = state_to_expand.fuel_as_int - link.distance
+            if fuel_left < 0:
+                continue
+            float(fuel_left)
+
+            successors_junction = None
+            stop_points_list = list(self.possible_stop_points)
+            for i in stop_points_list:
+                if i.index == link.target:
+                    successors_junction = i # This is the junction that the link links to
+
+            if successors_junction is not None:
+                successor_dropped_so_far = state_to_expand.dropped_so_far
+
+                drop_points_list = list(self.drop_points)
+                if successors_junction in drop_points_list:
+                    successor_dropped_so_far = successor_dropped_so_far | frozenset([successors_junction])
+
+                successor_state = RelaxedDeliveriesState(successors_junction, successor_dropped_so_far, fuel_left)
+
+                operator_cost = link.distance
+
+                yield successor_state, operator_cost
+
+            else:
+                continue
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
         This method receives a state and returns whether this state is a goal.
-        TODO: implement this method!
         """
         assert isinstance(state, RelaxedDeliveriesState)
 
-        raise NotImplemented()  # TODO: remove!
+        state_is_a_drop_point = state.current_location in list(self.drop_points)
+        state_has_nonnegative_fuel_amount = state.fuel_as_int >= 0
+
+        dropped = state.dropped_so_far
+        to_drop = self.drop_points
+
+        state_is_done_with_drops = dropped.issubset(to_drop) and to_drop.issubset(dropped)
+
+        return state_is_a_drop_point and state_has_nonnegative_fuel_amount and state_is_done_with_drops
+
 
     def solution_additional_str(self, result: 'SearchResult') -> str:
         """This method is used to enhance the printing method of a found solution."""
