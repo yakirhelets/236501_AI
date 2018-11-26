@@ -133,19 +133,22 @@ def relaxed_deliveries_problem():
     big_deliveries_prob = RelaxedDeliveriesProblem(big_delivery)
 
     # Ex.16
-    # TODO: create an instance of `AStar` with the `MaxAirDistHeuristic`,
     #       solve the `big_deliveries_prob` with it and print the results (as before).
-    exit()  # TODO: remove!
+
+    a_star_with_max_air_dist = AStar(MaxAirDistHeuristic)
+    res = a_star_with_max_air_dist.solve_problem(big_deliveries_prob)
+    print(res)
 
     # Ex.17
-    # TODO: create an instance of `AStar` with the `MSTAirDistHeuristic`,
     #       solve the `big_deliveries_prob` with it and print the results (as before).
-    exit()  # TODO: remove!
+    a_star_with_mst_air_dist = AStar(MSTAirDistHeuristic)
+    res = a_star_with_mst_air_dist.solve_problem(big_deliveries_prob)
+    print(res)
 
     # Ex.18
-    # TODO: Call here the function `run_astar_for_weights_in_range()`
     #       with `MSTAirDistHeuristic` and `big_deliveries_prob`.
-    exit()  # TODO: remove!
+    run_astar_for_weights_in_range(MSTAirDistHeuristic, big_deliveries_prob)
+
 
     # Ex.24
     # TODO:

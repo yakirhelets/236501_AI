@@ -55,7 +55,7 @@ class RelaxedDeliveriesState(GraphProblemState):
                 Otherwise the upper requirement would not met.
                 In our case, use `fuel_as_int`.
         """
-        return hash((self.current_location, self.fuel_as_int, self.dropped_so_far))
+        return hash((self.current_location, self.dropped_so_far, self.fuel_as_int))
 
     def __str__(self):
         """
@@ -97,35 +97,33 @@ class RelaxedDeliveriesProblem(GraphProblem):
         # Get the junction (in the map) that is represented by the state to expand.
         junction = state_to_expand.current_location
 
+        remaining_drop_points_list = self.drop_points.difference(state_to_expand.dropped_so_far)
+        gas_stations = self.gas_stations
+
+        all_possible_points = remaining_drop_points_list | gas_stations
+
         # Iterate over the outgoing roads of the current junction.
-        for link in junction.links:
+        for i in all_possible_points:
 
-            fuel_left = state_to_expand.fuel_as_int - link.distance
-            if fuel_left < 0:
+            distance = i.calc_air_distance_from(junction)
+
+            if state_to_expand.fuel - distance < 0:
                 continue
-            float(fuel_left)
 
-            successors_junction = None
-            stop_points_list = list(self.possible_stop_points)
-            for i in stop_points_list:
-                if i.index == link.target:
-                    successors_junction = i # This is the junction that the link links to
+            # i is a drop point that we haven't visited yet
+            if i in remaining_drop_points_list:
+                successor_dropped_so_far = {i} | state_to_expand.dropped_so_far
+                fuel_left = state_to_expand.fuel - distance
 
-            if successors_junction is not None:
-                successor_dropped_so_far = state_to_expand.dropped_so_far
-
-                drop_points_list = list(self.drop_points)
-                if successors_junction in drop_points_list:
-                    successor_dropped_so_far = successor_dropped_so_far | frozenset([successors_junction])
-
-                successor_state = RelaxedDeliveriesState(successors_junction, successor_dropped_so_far, fuel_left)
-
-                operator_cost = link.distance
-
-                yield successor_state, operator_cost
-
+            # i is a gas station
             else:
-                continue
+                successor_dropped_so_far = state_to_expand.dropped_so_far
+                fuel_left = self.gas_tank_capacity
+
+            successor_state = RelaxedDeliveriesState(i, successor_dropped_so_far, fuel_left)
+
+            yield successor_state, distance
+
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
@@ -133,13 +131,13 @@ class RelaxedDeliveriesProblem(GraphProblem):
         """
         assert isinstance(state, RelaxedDeliveriesState)
 
-        state_is_a_drop_point = state.current_location in list(self.drop_points)
+        state_is_a_drop_point = state.current_location in self.drop_points
         state_has_nonnegative_fuel_amount = state.fuel_as_int >= 0
 
         dropped = state.dropped_so_far
-        to_drop = self.drop_points
+        to_drop_in_total = self.drop_points
 
-        state_is_done_with_drops = dropped.issubset(to_drop) and to_drop.issubset(dropped)
+        state_is_done_with_drops = dropped.issubset(to_drop_in_total) and to_drop_in_total.issubset(dropped)
 
         return state_is_a_drop_point and state_has_nonnegative_fuel_amount and state_is_done_with_drops
 
