@@ -24,17 +24,8 @@ class GreedyStochastic(BestFirstSearch):
 
     def _open_successor_node(self, problem: GraphProblem, successor_node: SearchNode):
 
-        if self.open.has_state(successor_node.state):
-            already_found_node_with_same_state = self.open.get_node_by_state(successor_node.state)
-            if already_found_node_with_same_state.expanding_priority > successor_node.expanding_priority:
-                self.open.extract_node(already_found_node_with_same_state)
-                self.open.push_node(successor_node)
-
-        elif self.close.has_state(successor_node.state):
-            already_found_node_with_same_state = self.close.get_node_by_state(successor_node.state)
-            if already_found_node_with_same_state.expanding_priority > successor_node.expanding_priority:
-                self.close.remove_node(already_found_node_with_same_state)
-                self.open.push_node(successor_node)
+        if self.open.has_state(successor_node.state) or self.close.has_state(successor_node.state):
+            return
 
         else:
             self.open.push_node(successor_node)
