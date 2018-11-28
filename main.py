@@ -151,7 +151,6 @@ def relaxed_deliveries_problem():
 
 
     # Ex.24
-    # TODO:
     # 1. Run the stochastic greedy algorithm for 100 times.
     #    For each run, store the cost of the found solution.
     #    Store these costs in a list.
@@ -162,15 +161,58 @@ def relaxed_deliveries_problem():
     #    algorithm is the MINIMUM among the costs of the solutions
     #    found in iterations {1,...,i}. Calculate the costs of the
     #    anytime algorithm wrt the #iteration and store them in a list.
+
+    run_times_num = 100
+    stochastic_greedy_result_list = list()
+    anytime_result_list = list()
+
+    for i in range(run_times_num):
+        stochastic_greedy_ex_24 = GreedyStochastic(MSTAirDistHeuristic)
+        stochastic_greedy_result_list.append(stochastic_greedy_ex_24.solve_problem(big_deliveries_prob))
+        anytime_result_list.append(min(stochastic_greedy_result_list))
+
     # 3. Calculate and store the cost of the solution received by
     #    the A* algorithm (with w=0.5).
+
+    weight_for_a_star = 0.5
+
+    a_star_ex_24 = AStar(MSTAirDistHeuristic, weight_for_a_star)
+    a_star_result = a_star_ex_24.solve_problem(big_deliveries_prob)
+
+    a_star_result_list = [a_star_result] * run_times_num
+
     # 4. Calculate and store the cost of the solution received by
     #    the deterministic greedy algorithm (A* with w=1).
+
+    weight_for_deterministic_greedy = 1  # The weight for deterministic greedy is always 1
+
+    deterministic_greedy_ex_24 = AStar(MSTAirDistHeuristic, weight_for_deterministic_greedy)
+    deterministic_greedy_result = deterministic_greedy_ex_24.solve_problem(big_deliveries_prob)
+
+    deterministic_greedy_result_list = [deterministic_greedy_result] * run_times_num
+
     # 5. Plot a figure with the costs (y-axis) wrt the #iteration
     #    (x-axis). Of course that the costs of A*, and deterministic
     #    greedy are not dependent with the iteration number, so
     #    these two should be represented by horizontal lines.
-    exit()  # TODO: remove!
+
+    iterations = (1, run_times_num + 1)
+
+    results = list()
+    results.append(stochastic_greedy_result_list)
+    results.append(anytime_result_list)
+    results.append(a_star_result_list)
+    results.append(deterministic_greedy_result_list)
+
+    for i in range(len(results)):
+        plt.plot(iterations, results[i, :], label=str(iterations[i]))
+
+    plt.xlabel("Iteration Number")
+    plt.ylabel("Costs")
+    plt.title("Quality of the algorithm solution as a function of the iteration number")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
 
 def strict_deliveries_problem():
