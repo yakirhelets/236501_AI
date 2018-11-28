@@ -11,7 +11,7 @@ end_point = 5.0
 T = np.linspace(start_point, end_point, num_of_experiments, True, False, float)
 
 alpha = min(X)
-P = [[0 for x in range(X.size)] for y in range(T.size)]
+P = np.zeros(shape=(num_of_experiments,N))
 
 print(P)
 
@@ -34,7 +34,7 @@ for i in range(len(X)):
 print(P)
 
 for i in range(len(X)):
-    plt.plot(T, P[:, i], label=str(X[i]))
+    plt.plot(T, P[:,i], label=str(X[i]))
 
 plt.xlabel("T")
 plt.ylabel("P")
