@@ -161,8 +161,9 @@ def relaxed_deliveries_problem():
     #    algorithm is the MINIMUM among the costs of the solutions
     #    found in iterations {1,...,i}. Calculate the costs of the
     #    anytime algorithm wrt the #iteration and store them in a list.
-
-    run_times_num = 100
+    # TODO: switch back to 100
+    run_times_num = 10
+    # run_times_num = 100
     stochastic_greedy_result_list = list()
     anytime_result_list = list()
 

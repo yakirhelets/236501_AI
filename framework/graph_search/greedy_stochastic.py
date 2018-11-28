@@ -5,7 +5,6 @@ import numpy as np
 # import experiments.temperature as temp
 
 
-
 class GreedyStochastic(BestFirstSearch):
     def __init__(self, heuristic_function_type: HeuristicFunctionType,
                  T_init: float = 1.0, N: int = 5, T_scale_factor: float = 0.95):
@@ -37,8 +36,6 @@ class GreedyStochastic(BestFirstSearch):
         h = self.heuristic_function
         return h.estimate(search_node.state)
 
-
-
     def _extract_next_search_node_to_expand(self) -> Optional[SearchNode]:
         """
         Extracts the next node to expand from the open queue,
@@ -57,14 +54,14 @@ class GreedyStochastic(BestFirstSearch):
         min_N_and_open_size = min(self.N, len(self.open))
 
         # best_N = np.array(1, min_N_and_open_size)
-        best_N = []
-        print(min_N_and_open_size)
+        best_N = list()
+        # print(min_N_and_open_size)
         for i in range(min_N_and_open_size):
             best_N.append(self.open.pop_next_node())
 
         # print(best_N)
         # prob_array = np.array(1, min_N_and_open_size)
-        prob_array = []
+        prob_array = list()
 
         def calc_probability(T, xi, alpha, X):
             numerator = (self._calc_node_expanding_priority(xi) / self._calc_node_expanding_priority(alpha)) ** (-1 / T)
@@ -81,11 +78,11 @@ class GreedyStochastic(BestFirstSearch):
             prob_array.append(calc_probability(self.T, best_N[i], min(best_N), best_N))
 
         chosen_element = np.random.choice(best_N, None, False, prob_array)
-
-        print(chosen_element)
+        # print(best_N)
+        # print(prob_array)
+        # print(chosen_element)
         best_N.remove(chosen_element)
         # np.delete(best_N, chosen_element, None)
-
 
         for i in best_N:
             self.open.push_node(i)
