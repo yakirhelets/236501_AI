@@ -162,14 +162,15 @@ def relaxed_deliveries_problem():
     #    found in iterations {1,...,i}. Calculate the costs of the
     #    anytime algorithm wrt the #iteration and store them in a list.
     # TODO: switch back to 100
-    run_times_num = 10
+    run_times_num = 5
     # run_times_num = 100
     stochastic_greedy_result_list = list()
     anytime_result_list = list()
 
     for i in range(run_times_num):
         stochastic_greedy_ex_24 = GreedyStochastic(MSTAirDistHeuristic)
-        stochastic_greedy_result_list.append(stochastic_greedy_ex_24.solve_problem(big_deliveries_prob))
+        result_node = stochastic_greedy_ex_24.solve_problem(big_deliveries_prob)
+        stochastic_greedy_result_list.append(result_node.final_search_node.cost)
         anytime_result_list.append(min(stochastic_greedy_result_list))
 
     # 3. Calculate and store the cost of the solution received by

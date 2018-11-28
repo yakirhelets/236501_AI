@@ -55,27 +55,32 @@ class GreedyStochastic(BestFirstSearch):
 
         # best_N = np.array(1, min_N_and_open_size)
         best_N = list()
+        heuristic_N_list = list()
+
         # print(min_N_and_open_size)
         for i in range(min_N_and_open_size):
-            best_N.append(self.open.pop_next_node())
+            next_node = self.open.pop_next_node()
+            best_N.append(next_node)
+            heuristic_N_list.append(next_node.expanding_priority)
 
         # print(best_N)
         # prob_array = np.array(1, min_N_and_open_size)
         prob_array = list()
 
+        # TODO: try to remove from function
         def calc_probability(T, xi, alpha, X):
-            numerator = (self._calc_node_expanding_priority(xi) / self._calc_node_expanding_priority(alpha)) ** (-1 / T)
+            numerator = (xi / alpha) ** (-1 / T)
             denominator = 0
 
             for x in X:
-                denominator += (self._calc_node_expanding_priority(x) / self._calc_node_expanding_priority(alpha)) ** (-1 / T)
+                denominator += (x.expanding_priority / alpha) ** (-1 / T)
 
             return float(numerator / denominator)
 
         for i in range(min_N_and_open_size):
             # prob_array[i] = calc_probability(self.T, best_N[i], min(best_N), best_N)
 
-            prob_array.append(calc_probability(self.T, best_N[i], min(best_N), best_N))
+            prob_array.append(calc_probability(self.T, heuristic_N_list[i], min(heuristic_N_list), best_N))
 
         chosen_element = np.random.choice(best_N, None, False, prob_array)
         # print(best_N)
@@ -86,3 +91,5 @@ class GreedyStochastic(BestFirstSearch):
 
         for i in best_N:
             self.open.push_node(i)
+
+        return chosen_element
