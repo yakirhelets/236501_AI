@@ -85,18 +85,3 @@ class AStar(BestFirstSearch):
 
         else:
             self.open.push_node(successor_node)
-
-
-
-        # -----
-
-        # if self.close.has_state(successor_node.state):
-        #     return
-        #
-        # if self.open.has_state(successor_node.state):
-        #     already_found_node_with_same_state = self.open.get_node_by_state(successor_node.state)
-        #     if already_found_node_with_same_state.expanding_priority > successor_node.expanding_priority:
-        #         self.open.extract_node(already_found_node_with_same_state)
-        #
-        # if not self.open.has_state(successor_node.state):
-        #     self.open.push_node(successor_node)
