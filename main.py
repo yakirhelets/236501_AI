@@ -204,6 +204,7 @@ def relaxed_deliveries_problem():
     results.append(a_star_result_list)
     results.append(deterministic_greedy_result_list)
 
+    plt.figure(2)
     for i in range(len(results)):
         plt.plot(iterations, results[i, :], label=str(iterations[i]))
 
@@ -213,6 +214,8 @@ def relaxed_deliveries_problem():
     plt.legend()
     plt.grid()
     plt.show()
+
+
 
 
 def strict_deliveries_problem():

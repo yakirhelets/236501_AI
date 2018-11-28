@@ -2,7 +2,7 @@ from .graph_problem_interface import *
 from .best_first_search import BestFirstSearch
 from typing import Optional
 import numpy as np
-import experiments.temperature as temp
+# import experiments.temperature as temp
 
 
 
@@ -38,6 +38,7 @@ class GreedyStochastic(BestFirstSearch):
         return h.estimate(search_node.state)
 
 
+
     def _extract_next_search_node_to_expand(self) -> Optional[SearchNode]:
         """
         Extracts the next node to expand from the open queue,
@@ -53,21 +54,38 @@ class GreedyStochastic(BestFirstSearch):
                 pushed again into that queue.
         """
 
-        min_N_and_open_size = min(self.N, len(open()))
+        min_N_and_open_size = min(self.N, len(self.open))
 
-        best_N = np.array(1, min_N_and_open_size)
+        # best_N = np.array(1, min_N_and_open_size)
+        best_N = []
+        print(min_N_and_open_size)
+        for i in range(min_N_and_open_size):
+            best_N.append(self.open.pop_next_node())
+
+        # print(best_N)
+        # prob_array = np.array(1, min_N_and_open_size)
+        prob_array = []
+
+        def calc_probability(T, xi, alpha, X):
+            numerator = (self._calc_node_expanding_priority(xi) / self._calc_node_expanding_priority(alpha)) ** (-1 / T)
+            denominator = 0
+
+            for x in X:
+                denominator += (self._calc_node_expanding_priority(x) / self._calc_node_expanding_priority(alpha)) ** (-1 / T)
+
+            return float(numerator / denominator)
 
         for i in range(min_N_and_open_size):
-            best_N[i] = self.open.pop_next_node()
+            # prob_array[i] = calc_probability(self.T, best_N[i], min(best_N), best_N)
 
-        prob_array = np.array(1, min_N_and_open_size)
-
-        for i in range(min_N_and_open_size):
-            prob_array[i] = temp.calc_probability(self.T, best_N[i], min(best_N), best_N)
+            prob_array.append(calc_probability(self.T, best_N[i], min(best_N), best_N))
 
         chosen_element = np.random.choice(best_N, None, False, prob_array)
 
-        np.delete(best_N, chosen_element, None)
+        print(chosen_element)
+        best_N.remove(chosen_element)
+        # np.delete(best_N, chosen_element, None)
+
 
         for i in best_N:
             self.open.push_node(i)

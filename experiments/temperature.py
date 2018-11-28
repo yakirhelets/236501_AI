@@ -29,6 +29,7 @@ for i in range(len(X)):
 
 print(P)
 
+plt.figure(1)
 for i in range(len(X)):
     plt.plot(T, P[:,i], label=str(X[i]))
 
