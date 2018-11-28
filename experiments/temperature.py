@@ -13,8 +13,6 @@ T = np.linspace(start_point, end_point, num_of_experiments, True, False, float)
 alpha = min(X)
 P = np.zeros(shape=(num_of_experiments,N))
 
-print(P)
-
 def calc_probability(T, xi, alpha, X):
     numerator = (xi / alpha)**(-1 / T)
     denominator = 0
@@ -24,12 +22,10 @@ def calc_probability(T, xi, alpha, X):
 
     return float(numerator / denominator)
 
-
 for i in range(len(X)):
     xi = X[i]
     for j in range(len(T)):
         P[j][i] = calc_probability(T[j], xi, alpha, X)
-
 
 print(P)
 
@@ -43,10 +39,3 @@ plt.legend()
 plt.grid()
 plt.show()
 exit()
-
-
-###
-P = [[0 for x in range(5)] for y in range(100)]
-for i in range(5):
-    P[:, i]
-
