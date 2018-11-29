@@ -181,7 +181,7 @@ def relaxed_deliveries_problem():
     a_star_ex_24 = AStar(MSTAirDistHeuristic, weight_for_a_star)
     a_star_result = a_star_ex_24.solve_problem(big_deliveries_prob)
 
-    a_star_result_list = [a_star_result] * run_times_num
+    a_star_result_list = [a_star_result.final_search_node.cost] * run_times_num
 
     # 4. Calculate and store the cost of the solution received by
     #    the deterministic greedy algorithm (A* with w=1).
@@ -191,7 +191,7 @@ def relaxed_deliveries_problem():
     deterministic_greedy_ex_24 = AStar(MSTAirDistHeuristic, weight_for_deterministic_greedy)
     deterministic_greedy_result = deterministic_greedy_ex_24.solve_problem(big_deliveries_prob)
 
-    deterministic_greedy_result_list = [deterministic_greedy_result] * run_times_num
+    deterministic_greedy_result_list = [deterministic_greedy_result.final_search_node.cost] * run_times_num
 
     # 5. Plot a figure with the costs (y-axis) wrt the #iteration
     #    (x-axis). Of course that the costs of A*, and deterministic
@@ -199,12 +199,17 @@ def relaxed_deliveries_problem():
     #    these two should be represented by horizontal lines.
 
     iterations = (1, run_times_num + 1)
+    num_of_results_in_graph = 4
 
-    results = list()
+    results = np.zeros(shape=(num_of_results_in_graph, run_times_num))
+
+    results = np.array()
     results.append(stochastic_greedy_result_list)
     results.append(anytime_result_list)
     results.append(a_star_result_list)
     results.append(deterministic_greedy_result_list)
+
+    print(results)  # TODO: remove later
 
     plt.figure(2)
     for i in range(len(results)):
