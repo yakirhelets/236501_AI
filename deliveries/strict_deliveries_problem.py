@@ -68,7 +68,39 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
         """
         assert isinstance(state_to_expand, StrictDeliveriesState)
 
-        raise NotImplemented()  # TODO: remove!
+        # Get the junction (in the map) that is represented by the state to expand.
+        junction = state_to_expand.current_location
+
+        remaining_drop_points_list = self.drop_points.difference(state_to_expand.dropped_so_far)
+        gas_stations = self.gas_stations
+
+        all_possible_points = remaining_drop_points_list | gas_stations
+
+        # Iterate over the outgoing roads of the current junction.
+        for link in junction.links:
+            link_target = link.target
+            target_junction = self.roads.get(link_target)
+            if target_junction is None:
+                print("do somthing") #TODO: change that
+
+            distance = link.distance
+            if state_to_expand.fuel - distance < 0:
+                continue
+
+            # target_junction is a drop point that we haven't visited yet
+            if target_junction in remaining_drop_points_list:
+                successor_dropped_so_far = {target_junction} | state_to_expand.dropped_so_far
+                fuel_left = state_to_expand.fuel - distance
+
+            # target_junction is a gas station
+            else:
+                successor_dropped_so_far = state_to_expand.dropped_so_far
+                fuel_left = self.gas_tank_capacity
+
+            successor_state = StrictDeliveriesState(target_junction, successor_dropped_so_far, fuel_left)
+
+            yield successor_state, distance
+
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
@@ -77,4 +109,13 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
         """
         assert isinstance(state, StrictDeliveriesState)
 
-        raise NotImplemented()  # TODO: remove!
+        state_is_a_drop_point = state.current_location in self.drop_points
+        state_has_nonnegative_fuel_amount = state.fuel_as_int >= 0
+
+        dropped = state.dropped_so_far
+        to_drop_in_total = self.drop_points
+
+        state_is_done_with_drops = dropped.issubset(to_drop_in_total) and to_drop_in_total.issubset(dropped)
+
+        return state_is_a_drop_point and state_has_nonnegative_fuel_amount and state_is_done_with_drops
+

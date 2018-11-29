@@ -74,7 +74,6 @@ class GreedyStochastic(BestFirstSearch):
             best_N.append(next_node)
             heuristic_N_list.append(next_node.expanding_priority)
 
-        print(best_N)
         prob_array = list()
 
         if chosen_element is None:
