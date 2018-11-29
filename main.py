@@ -198,7 +198,7 @@ def relaxed_deliveries_problem():
     #    greedy are not dependent with the iteration number, so
     #    these two should be represented by horizontal lines.
 
-    iterations = (1, run_times_num + 1)
+    iterations = list(range(run_times_num))
     num_of_results_in_graph = 4
 
     results = np.zeros(shape=(num_of_results_in_graph, run_times_num))
@@ -219,7 +219,6 @@ def relaxed_deliveries_problem():
     plt.figure(2)
     for i in range(len(results)):
         plt.plot(iterations, results[i, :], label=str(iterations[i]))
-
     plt.xlabel("Iteration Number")
     plt.ylabel("Costs")
     plt.title("Quality of the algorithm solution as a function of the iteration number")
