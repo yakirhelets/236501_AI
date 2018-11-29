@@ -49,21 +49,6 @@ class GreedyStochastic(BestFirstSearch):
                 of these popped items. The other items have to be
                 pushed again into that queue.
         """
-
-        min_N_and_open_size = min(self.N, len(self.open))
-
-        # best_N = np.array(1, min_N_and_open_size)
-        best_N = list()
-        heuristic_N_list = list()
-
-        for i in range(min_N_and_open_size):
-            next_node = self.open.pop_next_node()
-            best_N.append(next_node)
-            heuristic_N_list.append(next_node.expanding_priority)
-
-        print(best_N)
-        prob_array = list()
-
         # TODO: try to remove from function
         def calc_probability(T, xi, alpha, X):
             numerator = (xi / alpha) ** (-1 / T)
@@ -74,14 +59,34 @@ class GreedyStochastic(BestFirstSearch):
 
             return float(numerator / denominator)
 
-        for i in range(min_N_and_open_size):
-            prob_array.append(calc_probability(self.T, heuristic_N_list[i], min(heuristic_N_list), best_N))
-            if min(heuristic_N_list) == 0:
-                chosen_element = best_N[i]
 
-        if min(heuristic_N_list) != 0:
+
+
+        min_N_and_open_size = min(self.N, len(self.open))
+
+        # best_N = np.array(1, min_N_and_open_size)
+        best_N = list()
+        heuristic_N_list = list()
+        chosen_element = None
+
+        for i in range(min_N_and_open_size):
+            next_node = self.open.pop_next_node()
+            if next_node.expanding_priority == 0:
+                chosen_element = next_node
+
+            best_N.append(next_node)
+            heuristic_N_list.append(next_node.expanding_priority)
+
+        print(best_N)
+        prob_array = list()
+
+        if chosen_element is None:
+            for i in range(min_N_and_open_size):
+                prob_array.append(calc_probability(self.T, heuristic_N_list[i], min(heuristic_N_list), best_N))
+
             chosen_element = np.random.choice(best_N, None, False, prob_array)
 
+        # At this point we have a chose_element
         best_N.remove(chosen_element)
 
         for i in best_N:

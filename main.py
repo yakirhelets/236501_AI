@@ -169,8 +169,8 @@ def relaxed_deliveries_problem():
 
     for i in range(run_times_num):
         stochastic_greedy_ex_24 = GreedyStochastic(MSTAirDistHeuristic)
-        result_node = stochastic_greedy_ex_24.solve_problem(big_deliveries_prob)
-        stochastic_greedy_result_list.append(result_node.final_search_node.cost)
+        search_result = stochastic_greedy_ex_24.solve_problem(big_deliveries_prob)
+        stochastic_greedy_result_list.append(search_result.final_search_node.cost)
         anytime_result_list.append(min(stochastic_greedy_result_list))
 
     # 3. Calculate and store the cost of the solution received by
