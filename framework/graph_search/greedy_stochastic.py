@@ -2,7 +2,6 @@ from .graph_problem_interface import *
 from .best_first_search import BestFirstSearch
 from typing import Optional
 import numpy as np
-# import experiments.temperature as temp
 
 
 class GreedyStochastic(BestFirstSearch):
@@ -57,14 +56,12 @@ class GreedyStochastic(BestFirstSearch):
         best_N = list()
         heuristic_N_list = list()
 
-        # print(min_N_and_open_size)
         for i in range(min_N_and_open_size):
             next_node = self.open.pop_next_node()
             best_N.append(next_node)
             heuristic_N_list.append(next_node.expanding_priority)
 
-        # print(best_N)
-        # prob_array = np.array(1, min_N_and_open_size)
+        print(best_N)
         prob_array = list()
 
         # TODO: try to remove from function
@@ -78,18 +75,17 @@ class GreedyStochastic(BestFirstSearch):
             return float(numerator / denominator)
 
         for i in range(min_N_and_open_size):
-            # prob_array[i] = calc_probability(self.T, best_N[i], min(best_N), best_N)
-
             prob_array.append(calc_probability(self.T, heuristic_N_list[i], min(heuristic_N_list), best_N))
+            if min(heuristic_N_list) == 0:
+                chosen_element = best_N[i]
 
-        chosen_element = np.random.choice(best_N, None, False, prob_array)
-        # print(best_N)
-        # print(prob_array)
-        # print(chosen_element)
+        if min(heuristic_N_list) != 0:
+            chosen_element = np.random.choice(best_N, None, False, prob_array)
+
         best_N.remove(chosen_element)
-        # np.delete(best_N, chosen_element, None)
 
         for i in best_N:
             self.open.push_node(i)
 
+        self.T = self.T*self.T_scale_factor
         return chosen_element
