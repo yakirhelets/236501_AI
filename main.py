@@ -162,7 +162,7 @@ def relaxed_deliveries_problem():
     #    found in iterations {1,...,i}. Calculate the costs of the
     #    anytime algorithm wrt the #iteration and store them in a list.
     # TODO: switch back to 100
-    run_times_num = 5
+    run_times_num = 100
     # run_times_num = 100
     stochastic_greedy_result_list = list()
     anytime_result_list = list()
@@ -201,12 +201,9 @@ def relaxed_deliveries_problem():
     iterations = list(range(run_times_num))
     num_of_results_in_graph = 4
 
-    results = np.zeros(shape=(num_of_results_in_graph, run_times_num))
+    legend_list = list(["Greedy Stoch", "Anytime", "A*", "Greedy Deter"])
 
-    # results.__add__(stochastic_greedy_result_list)
-    # results.__add__(anytime_result_list)
-    # results.__add__(a_star_result_list)
-    # results.__add__(deterministic_greedy_result_list)
+    results = np.zeros(shape=(num_of_results_in_graph, run_times_num))
 
     for i in range(run_times_num):
         results[0][i] = stochastic_greedy_result_list[i]
@@ -214,11 +211,9 @@ def relaxed_deliveries_problem():
         results[2][i] = a_star_result_list[i]
         results[3][i] = deterministic_greedy_result_list[i]
 
-    print(results)  # TODO: remove later
-
     plt.figure(2)
     for i in range(len(results)):
-        plt.plot(iterations, results[i, :], label=str(iterations[i]))
+        plt.plot(iterations, results[i, :], label=str(legend_list[i]))
     plt.xlabel("Iteration Number")
     plt.ylabel("Costs")
     plt.title("Quality of the algorithm solution as a function of the iteration number")

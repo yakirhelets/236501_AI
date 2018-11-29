@@ -59,9 +59,6 @@ class GreedyStochastic(BestFirstSearch):
 
             return float(numerator / denominator)
 
-
-
-
         min_N_and_open_size = min(self.N, len(self.open))
 
         # best_N = np.array(1, min_N_and_open_size)
