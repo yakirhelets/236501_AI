@@ -203,10 +203,16 @@ def relaxed_deliveries_problem():
 
     results = np.zeros(shape=(num_of_results_in_graph, run_times_num))
 
-    results.__add__ (stochastic_greedy_result_list)
-    results.__add__(anytime_result_list)
-    results.__add__(a_star_result_list)
-    results.__add__(deterministic_greedy_result_list)
+    # results.__add__(stochastic_greedy_result_list)
+    # results.__add__(anytime_result_list)
+    # results.__add__(a_star_result_list)
+    # results.__add__(deterministic_greedy_result_list)
+
+    for i in range(run_times_num):
+        results[0][i] = stochastic_greedy_result_list[i]
+        results[1][i] = anytime_result_list[i]
+        results[2][i] = a_star_result_list[i]
+        results[3][i] = deterministic_greedy_result_list[i]
 
     print(results)  # TODO: remove later
 
