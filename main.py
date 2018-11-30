@@ -243,8 +243,8 @@ def strict_deliveries_problem():
         small_delivery, roads, inner_problem_solver=AStar(MSTAirDistHeuristic))
 
     a_star_in_strict = AStar(RelaxedDeliveriesHeuristic)
-    a_star_result = a_star_in_strict.solve_problem(strict_problem_using_relaxed)
-
+    res = a_star_in_strict.solve_problem(strict_problem_using_relaxed)
+    print(res)
 
 
 def main():
