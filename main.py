@@ -221,9 +221,6 @@ def relaxed_deliveries_problem():
     plt.grid()
     plt.show()
 
-
-
-
 def strict_deliveries_problem():
     print()
     print('Solve the strict deliveries problem.')

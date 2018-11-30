@@ -69,42 +69,49 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
         assert isinstance(state_to_expand, StrictDeliveriesState)
 
         # Get the junction (in the map) that is represented by the state to expand.
-        junction = state_to_expand.current_location
+        current_junction = state_to_expand.current_location
 
         remaining_drop_points_list = self.drop_points.difference(state_to_expand.dropped_so_far)
         gas_stations = self.gas_stations
 
-        # TODO: need to do something with inner (with the heuristic) and the cache.
-        # TODO: maybe the cache stores index num of a state and also h(s).
+        all_possible_points = remaining_drop_points_list | gas_stations
 
-        # Iterate over the outgoing roads of the current junction.
-        for link in junction.links:
-            link_target = link.target
-            target_junction = self.roads.get(link_target)
-            distance = link.distance
+        # Iterate over the possible points
+        for i in all_possible_points:
 
-            if target_junction is None or state_to_expand.fuel - distance < 0:
+            origin_destination = (current_junction.index, i.index)
+
+            # Trying to retrieve from cache the cost between origin and destination junctions
+            cost_from_cache = self._get_from_cache(origin_destination)
+
+            if not cost_from_cache is None:
+                cost = cost_from_cache
+            else:
+                search_result = self.inner_problem_solver \
+                    .solve_problem(MapProblem(self.roads, current_junction.index, i.index))
+
+                cost = search_result.final_search_node.cost
+
+                # Storing in cache the cost between origin and destination junctions
+                self._insert_to_cache(origin_destination, cost)
+
+            if i is None or state_to_expand.fuel - cost < 0:
                 continue
 
             # target_junction is a drop point that we haven't visited yet
-            if target_junction in remaining_drop_points_list:
+            if i in remaining_drop_points_list:
                 # Adding the new drop point to the dropped_so_far list
-                successor_dropped_so_far = {target_junction} | state_to_expand.dropped_so_far
-                fuel_left = state_to_expand.fuel - distance
+                successor_dropped_so_far = {i} | state_to_expand.dropped_so_far
+                fuel_left = state_to_expand.fuel - cost
 
             # target_junction is a gas station
-            elif target_junction in gas_stations:
+            else:
                 successor_dropped_so_far = state_to_expand.dropped_so_far
                 fuel_left = self.gas_tank_capacity
 
-            # target_junction is neither a drop point we haven't visited yet, nor a gas station
-            else:
-                successor_dropped_so_far = state_to_expand.dropped_so_far
-                fuel_left = state_to_expand.fuel - distance
+            successor_state = StrictDeliveriesState(i, successor_dropped_so_far, fuel_left)
 
-            successor_state = StrictDeliveriesState(target_junction, successor_dropped_so_far, fuel_left)
-
-            yield successor_state, distance
+            yield successor_state, cost
 
 
     def is_goal(self, state: GraphProblemState) -> bool:
