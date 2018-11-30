@@ -84,5 +84,18 @@ class RelaxedDeliveriesHeuristic(HeuristicFunction):
         assert isinstance(self.problem, StrictDeliveriesProblem)
         assert isinstance(state, StrictDeliveriesState)
 
+        #TODO: run relaxed problem
+
+        RelaxedDeliveriesProblem
+
+        self.problem.
+
+        new_deliveries_problem = DeliveriesProblemInput.load_from_file('big_delivery.in', self.problem.roads)
+        new_deliveries_problem = RelaxedDeliveriesProblem(self.problem)
+        a_star_with_max_air_dist = AStar(new_deliveries_problem)
+        res = a_star_with_max_air_dist.solve_problem(big_deliveries_prob)
+        print(res)
+
+
         raise NotImplemented()  # TODO: remove!
 
