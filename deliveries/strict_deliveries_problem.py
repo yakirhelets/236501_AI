@@ -74,28 +74,33 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
         remaining_drop_points_list = self.drop_points.difference(state_to_expand.dropped_so_far)
         gas_stations = self.gas_stations
 
-        all_possible_points = remaining_drop_points_list | gas_stations
+        # TODO: need to do something with inner (with the heuristic) and the cache.
+        # TODO: maybe the cache stores index num of a state and also h(s).
 
         # Iterate over the outgoing roads of the current junction.
         for link in junction.links:
             link_target = link.target
             target_junction = self.roads.get(link_target)
-            if target_junction is None:
-                print("do somthing") #TODO: change that
-
             distance = link.distance
-            if state_to_expand.fuel - distance < 0:
+
+            if target_junction is None or state_to_expand.fuel - distance < 0:
                 continue
 
             # target_junction is a drop point that we haven't visited yet
             if target_junction in remaining_drop_points_list:
+                # Adding the new drop point to the dropped_so_far list
                 successor_dropped_so_far = {target_junction} | state_to_expand.dropped_so_far
                 fuel_left = state_to_expand.fuel - distance
 
             # target_junction is a gas station
-            else:
+            elif target_junction in gas_stations:
                 successor_dropped_so_far = state_to_expand.dropped_so_far
                 fuel_left = self.gas_tank_capacity
+
+            # target_junction is neither a drop point we haven't visited yet, nor a gas station
+            else:
+                successor_dropped_so_far = state_to_expand.dropped_so_far
+                fuel_left = state_to_expand.fuel - distance
 
             successor_state = StrictDeliveriesState(target_junction, successor_dropped_so_far, fuel_left)
 
@@ -105,7 +110,6 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
     def is_goal(self, state: GraphProblemState) -> bool:
         """
         This method receives a state and returns whether this state is a goal.
-        TODO: implement this method!
         """
         assert isinstance(state, StrictDeliveriesState)
 
