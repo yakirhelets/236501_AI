@@ -86,13 +86,11 @@ class RelaxedDeliveriesHeuristic(HeuristicFunction):
 
         #TODO: run relaxed problem
 
-        small_delivery_input = DeliveriesProblemInput.load_from_file('small_delivery.in', self.problem.roads)
+        new_deliveries_input = DeliveriesProblemInput.load_from_file('small_delivery.in', self.problem.roads)
 
-        strict_problem_using_relaxed = RelaxedDeliveriesProblem(small_delivery_input)
-
-#        new_deliveries_problem = RelaxedDeliveriesProblem(self.problem)
- #       a_star_with_max_air_dist = AStar(new_deliveries_problem)
-  #      res = a_star_with_max_air_dist.solve_problem(big_deliveries_prob)
+        new_deliveries_problem = RelaxedDeliveriesProblem(new_deliveries_input)
+        a_star_on_relaxed = AStar(MSTAirDistHeuristic)
+        res = a_star_on_relaxed.solve_problem(new_deliveries_problem)
 
 
         raise NotImplemented()  # TODO: remove!
