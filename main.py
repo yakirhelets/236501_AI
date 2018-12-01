@@ -240,9 +240,11 @@ def strict_deliveries_problem():
     #       solve the `small_deliveries_strict_problem` with it and print the results (as before).
 
     strict_problem_using_relaxed = StrictDeliveriesProblem(
-        small_delivery, roads, inner_problem_solver=AStar(MSTAirDistHeuristic))
+        small_delivery, roads, inner_problem_solver=AStar(MSTAirDistHeuristic)
+    )
 
     a_star_in_strict = AStar(RelaxedDeliveriesHeuristic)
+
     res = a_star_in_strict.solve_problem(strict_problem_using_relaxed)
     print(res)
 

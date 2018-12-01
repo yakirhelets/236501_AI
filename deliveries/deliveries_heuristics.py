@@ -86,12 +86,20 @@ class RelaxedDeliveriesHeuristic(HeuristicFunction):
 
         #TODO: run relaxed problem
 
-        new_deliveries_input = DeliveriesProblemInput.load_from_file('small_delivery.in', self.problem.roads)
-
+        # new_deliveries_input = DeliveriesProblemInput.load_from_file('small_delivery.in', self.problem.roads)
+        # We did not considered "state" parameter
+        new_deliveries_input = DeliveriesProblemInput(self.heuristic_name, state.current_location,
+                                                      self.problem.drop_points - state.dropped_so_far,
+                                                      self.problem.gas_stations, state.fuel,
+                                                      self.problem.gas_tank_capacity)
         new_deliveries_problem = RelaxedDeliveriesProblem(new_deliveries_input)
         a_star_on_relaxed = AStar(MSTAirDistHeuristic)
-        res = a_star_on_relaxed.solve_problem(new_deliveries_problem)
+        # res = a_star_on_relaxed.solve_problem(new_deliveries_problem)
+        res = a_star_on_relaxed.solve_problem(new_deliveries_problem).final_search_node
+        if res is None:         # res was a search node, should return float
+            return np.inf
+        else:
+            return res.cost
 
-
-        raise NotImplemented()  # TODO: remove!
+        # raise NotImplemented()  # TODO: remove!
 
