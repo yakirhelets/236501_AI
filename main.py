@@ -236,16 +236,12 @@ def strict_deliveries_problem():
 
 
     # Ex.28
-    # TODO: create an instance of `AStar` with the `RelaxedDeliveriesHeuristic`,
     #       solve the `small_deliveries_strict_problem` with it and print the results (as before).
 
-    strict_problem_using_relaxed = StrictDeliveriesProblem(
-        small_delivery, roads, inner_problem_solver=AStar(MSTAirDistHeuristic)
-    )
-
+    # RelaxedDeliveriesHeuristic has AStar(MST) already in it
     a_star_in_strict = AStar(RelaxedDeliveriesHeuristic)
 
-    res = a_star_in_strict.solve_problem(strict_problem_using_relaxed)
+    res = a_star_in_strict.solve_problem(small_deliveries_strict_problem)
     print(res)
 
 
