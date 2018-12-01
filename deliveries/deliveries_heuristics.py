@@ -89,6 +89,9 @@ class RelaxedDeliveriesHeuristic(HeuristicFunction):
                                                       state.fuel)
         new_deliveries_problem = RelaxedDeliveriesProblem(new_deliveries_input)
 
+        if self.problem.is_goal(state):
+            return 0.0
+
         a_star_on_relaxed = AStar(MSTAirDistHeuristic)
         res = a_star_on_relaxed.solve_problem(new_deliveries_problem).final_search_node
         if res is None:

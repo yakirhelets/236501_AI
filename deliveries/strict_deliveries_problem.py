@@ -58,7 +58,6 @@ class StrictDeliveriesProblem(RelaxedDeliveriesProblem):
 
     def expand_state_with_costs(self, state_to_expand: GraphProblemState) -> Iterator[Tuple[GraphProblemState, float]]:
         """
-        TODO: implement this method!
         This method represents the `Succ: S -> P(S)` function of the strict deliveries problem.
         The `Succ` function is defined by the problem operators as shown in class.
         The relaxed problem operators are defined in the assignment instructions.
