@@ -161,7 +161,6 @@ def relaxed_deliveries_problem():
     #    algorithm is the MINIMUM among the costs of the solutions
     #    found in iterations {1,...,i}. Calculate the costs of the
     #    anytime algorithm wrt the #iteration and store them in a list.
-    # TODO: switch back to 100
     run_times_num = 100
     # run_times_num = 100
     stochastic_greedy_result_list = list()
@@ -233,7 +232,6 @@ def strict_deliveries_problem():
     #       with `MSTAirDistHeuristic` and `big_deliveries_prob`.
 
     run_astar_for_weights_in_range(MSTAirDistHeuristic, small_deliveries_strict_problem)
-
 
     # Ex.28
     #       solve the `small_deliveries_strict_problem` with it and print the results (as before).
