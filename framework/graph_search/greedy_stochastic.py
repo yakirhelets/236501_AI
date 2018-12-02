@@ -49,7 +49,6 @@ class GreedyStochastic(BestFirstSearch):
                 of these popped items. The other items have to be
                 pushed again into that queue.
         """
-        # TODO: try to remove from function
         def calc_probability(T, xi, alpha, X):
             numerator = (xi / alpha) ** (-1 / T)
             denominator = 0
