@@ -110,30 +110,30 @@ def find_closest_point_with_food(gameState):
 
     visited = set()
     nodes_queue = util.Queue()
-    nodes_queue.push(gameState.getPacmanPosition())
+    nodes_queue.push(gameState)
 
     while not nodes_queue.isEmpty():
-        next_node = nodes_queue.pop()
-        print("next_node: " + next_node)
-        x = next_node[0]
-        print("next_node[0]: " + x)
-        y = next_node[1]
-        print("next_node[1]: " + y)
+        next_node_state = nodes_queue.pop()
+        next_node_position = next_node_state.getPacmanPosition()
+        x = next_node_position[0]
+        y = next_node_position[1]
         game_food_state = gameState.getFood()
         if game_food_state[x][y] and (x, y) is not None:
-            return x, y
+            return next_node_position
         else:
-            visited.add(next_node)
-            print("visited: " + visited)
+            visited.add(next_node_position)
 
-        neighbours = gameState.getLegalPacmanActions()
-        print("neighbours: " + neighbours)
+        neighbours = next_node_state.getLegalPacmanActions()
         for i in range(len(neighbours)):
-            neighbours[i] = gameState.generatePacmanSuccessor(neighbours[i]).getPacmanPosition()
-            if neighbours[i] not in visited:
+            neighbours[i] = next_node_state.generatePacmanSuccessor(neighbours[i]) # neighbours represents states
+            if neighbours[i].getPacmanPosition() not in visited:
+                print(neighbours[i])
                 # TODO: add the following condition to the if:  "and neighbour not in nodes_queue"
                 nodes_queue.push(neighbours[i])
+        print("finished adding to queue")
+
             # Food will certainly be found because else the game is over with a win
+    print("\n")
     print("Finished BFS")
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
