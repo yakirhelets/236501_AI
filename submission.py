@@ -97,8 +97,8 @@ def betterEvaluationFunction(gameState):
 
     closest_point_with_food = find_closest_point_with_food(gameState)
 
-    print(closest_point_with_food)
     score += -(util.manhattanDistance(pacman_position, closest_point_with_food))
+
 
     return score
 
@@ -118,7 +118,7 @@ def find_closest_point_with_food(gameState):
         x = next_node_position[0]
         y = next_node_position[1]
         game_food_state = gameState.getFood()
-        if game_food_state[x][y] and (x, y) is not None:
+        if game_food_state[x][y] and next_node_position is not None:
             return next_node_position
         else:
             visited.add(next_node_position)
@@ -127,14 +127,11 @@ def find_closest_point_with_food(gameState):
         for i in range(len(neighbours)):
             neighbours[i] = next_node_state.generatePacmanSuccessor(neighbours[i]) # neighbours represents states
             if neighbours[i].getPacmanPosition() not in visited:
-                print(neighbours[i])
                 # TODO: add the following condition to the if:  "and neighbour not in nodes_queue"
                 nodes_queue.push(neighbours[i])
-        print("finished adding to queue")
-
             # Food will certainly be found because else the game is over with a win
-    print("\n")
-    print("Finished BFS")
+
+    return (0,0) # At this point game is over with a win
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
 
