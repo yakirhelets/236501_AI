@@ -1,4 +1,6 @@
 import random, util
+from collections import deque
+
 from game import Agent
 import math
 import queue
@@ -26,7 +28,6 @@ class ReflexAgent(Agent):
     """
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions()
-
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
@@ -73,7 +74,8 @@ def betterEvaluationFunction(gameState):
   The GameState class is defined in pacman.py and you might want to look into that for other helper methods.
   """
 
-    minimum_ditance_from_ghosts = 4
+    fear_factor = 3
+    ghost_proximity_penalty = 1000
 
     score = 0
 
@@ -83,12 +85,13 @@ def betterEvaluationFunction(gameState):
     distance_from_closest_ghost = math.inf
 
     for ghost_position in ghost_positions:
+        # TODO: change to improved distance but including all legal actions from ghost, not just ghost's position
         current_distance = util.manhattanDistance(pacman_position, ghost_position)
         if (current_distance < distance_from_closest_ghost):
             distance_from_closest_ghost = current_distance
 
-    if (distance_from_closest_ghost < minimum_ditance_from_ghosts):
-        score += (distance_from_closest_ghost - 1000)
+    if (distance_from_closest_ghost < fear_factor):
+        score += (distance_from_closest_ghost - ghost_proximity_penalty)
 
     # Sub-Section b in Part B, q1
     score += gameState.getScore()
@@ -96,9 +99,8 @@ def betterEvaluationFunction(gameState):
     # Sub-Section c in Part B, q1
 
     closest_point_with_food = find_closest_point_with_food(gameState)
-
-    score += -(util.manhattanDistance(pacman_position, closest_point_with_food))
-
+    distance = distance_with_board_constraints(gameState, closest_point_with_food)
+    score += -(distance)
 
     return score
 
@@ -109,29 +111,51 @@ def find_closest_point_with_food(gameState):
   """
 
     visited = set()
-    nodes_queue = util.Queue()
-    nodes_queue.push(gameState)
+    nodes_queue = deque()
+    nodes_queue.appendleft(gameState)
 
-    while not nodes_queue.isEmpty():
+    while nodes_queue: # Not empty
         next_node_state = nodes_queue.pop()
         next_node_position = next_node_state.getPacmanPosition()
         x = next_node_position[0]
         y = next_node_position[1]
         game_food_state = gameState.getFood()
-        if game_food_state[x][y] and next_node_position is not None:
+        if game_food_state[x][y]:
             return next_node_position
         else:
             visited.add(next_node_position)
 
-        neighbours = next_node_state.getLegalPacmanActions()
-        for i in range(len(neighbours)):
-            neighbours[i] = next_node_state.generatePacmanSuccessor(neighbours[i]) # neighbours represents states
-            if neighbours[i].getPacmanPosition() not in visited:
-                # TODO: add the following condition to the if:  "and neighbour not in nodes_queue"
-                nodes_queue.push(neighbours[i])
+        actions = next_node_state.getLegalPacmanActions()
+        for action in actions:
+            action = next_node_state.generatePacmanSuccessor(action) # "actions" represents states now
+            if action.getPacmanPosition() not in visited and nodes_queue.count(action) == 0:
+                nodes_queue.appendleft(action)
             # Food will certainly be found because else the game is over with a win
 
     return (0,0) # At this point game is over with a win
+
+
+def distance_with_board_constraints(gameState, point):
+    """
+    Finds the actual distance between two points considering the walls of the board
+    """
+    visited = set()
+    nodes_queue = deque()
+    nodes_queue.appendleft((gameState, 0))
+
+    while nodes_queue:
+        next_node_state, curr_dist = nodes_queue.pop()
+        if next_node_state.getPacmanPosition() == point:
+            return curr_dist
+        else:
+            visited.add(next_node_state.getPacmanPosition())
+
+        actions = next_node_state.getLegalPacmanActions()
+        for action in actions:
+            action = next_node_state.generatePacmanSuccessor(action) # "actions" represents states now
+            if action.getPacmanPosition() not in visited and nodes_queue.count((action, "\d")) == 0:
+                nodes_queue.appendleft((action, curr_dist + 1))
+    return 1
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
 
