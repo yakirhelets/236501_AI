@@ -127,9 +127,9 @@ def find_closest_point_with_food(gameState):
 
         actions = next_node_state.getLegalPacmanActions()
         for action in actions:
-            action = next_node_state.generatePacmanSuccessor(action) # "actions" represents states now
-            if action.getPacmanPosition() not in visited and nodes_queue.count(action) == 0:
-                nodes_queue.appendleft(action)
+            new_state = next_node_state.generatePacmanSuccessor(action)
+            if new_state.getPacmanPosition() not in visited and nodes_queue.count(new_state) == 0:
+                nodes_queue.appendleft(new_state)
             # Food will certainly be found because else the game is over with a win
 
     return (0,0) # At this point game is over with a win
@@ -152,9 +152,16 @@ def distance_with_board_constraints(gameState, point):
 
         actions = next_node_state.getLegalPacmanActions()
         for action in actions:
-            action = next_node_state.generatePacmanSuccessor(action) # "actions" represents states now
-            if action.getPacmanPosition() not in visited and nodes_queue.count((action, "\d")) == 0:
-                nodes_queue.appendleft((action, curr_dist + 1))
+            new_state = next_node_state.generatePacmanSuccessor(action)
+
+            action_already_in_queue = False # TODO: probably remove bc it is only true very rarely and it makes it slow
+            for node in nodes_queue:
+                node_state = node[0]
+                if new_state is node_state:
+                    action_already_in_queue = True
+            print(action_already_in_queue)
+            if new_state.getPacmanPosition() not in visited and not action_already_in_queue:
+                nodes_queue.appendleft((new_state, curr_dist + 1))
     return 1
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
@@ -224,8 +231,49 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+
+        legal_pacman_actions = gameState.getLegalPacmanActions()
+        minimax_values = [self.minimaxValue(gameState.generateSuccessor(0, action), 1, 0) for action in legal_pacman_actions]
+        max_value = max(minimax_values)
+        bestIndices = [index for index in range(len(minimax_values)) if minimax_values[index] == max_value]
+        chosenIndex = random.choice(bestIndices)
+        return legal_pacman_actions[chosenIndex] # Reutrns the minimax action
+
         # END_YOUR_CODE
+
+    def minimaxValue(self, gameState, agentIndex, searchDepth):
+
+        # The base cases
+        # if reached self.depth - stop and return value of heuristic function of state
+        if (searchDepth == self.depth):
+            return self.evaluationFunction(gameState)
+        # else if it's a final node that leads to win or lost - return the score - TODO: might be a problem with values
+        if gameState.isWin() or gameState.isLose():
+            return gameState.getScore() # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
+                                            # TODO: maybe we should use Directions.STOP
+        # The recursion
+        current_agent_index = agentIndex
+        if gameState.getNumAgents() == current_agent_index:
+            current_agent_index = 0
+        legal_agent_actions = gameState.getLegalActions(current_agent_index)
+        children_states = [gameState.generateSuccessor(current_agent_index, action) for action in legal_agent_actions]
+
+        if current_agent_index == 0: # It is pacman's turn - we want to maximize the choice
+            cur_max = float('-inf')
+            for c in children_states:
+                v = self.minimaxValue(c, current_agent_index + 1, searchDepth + 1)
+                cur_max = max(v, cur_max)
+            return cur_max
+        else:  # It is a ghost's turn - we want to minimize the choice
+            cur_min = float('inf')
+            for c in children_states:
+                # Only pacman increases depth because it symbolizes a new iteration on all the agents
+                v = self.minimaxValue(c, current_agent_index + 1, searchDepth)
+                cur_min = min(v, cur_min)
+            return cur_min
+
+
+
 
 
 ######################################################################################
