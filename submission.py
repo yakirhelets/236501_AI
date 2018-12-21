@@ -159,7 +159,6 @@ def distance_with_board_constraints(gameState, point):
                 node_state = node[0]
                 if new_state is node_state:
                     action_already_in_queue = True
-            print(action_already_in_queue)
             if new_state.getPacmanPosition() not in visited and not action_already_in_queue:
                 nodes_queue.appendleft((new_state, curr_dist + 1))
     return 1
@@ -290,8 +289,54 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
 
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
-        # END_YOUR_CODE
+
+        legal_pacman_actions = gameState.getLegalPacmanActions()
+        alpha_beta_values = [self.alphaBetaValue(gameState.generateSuccessor(0, action), 1, 0, float('-inf'), float('inf')) for action in legal_pacman_actions]
+        max_value = max(alpha_beta_values)
+        bestIndices = [index for index in range(len(alpha_beta_values)) if alpha_beta_values[index] == max_value]
+        chosenIndex = random.choice(bestIndices)
+        return legal_pacman_actions[chosenIndex] # Reutrns the alphabeta action
+
+        #  END_YOUR_CODE
+
+    def alphaBetaValue(self, gameState, agentIndex, searchDepth, alpha, beta):
+
+        # The base cases
+        # if reached self.depth - stop and return value of heuristic function of state
+        if (searchDepth == self.depth):
+            return self.evaluationFunction(gameState)
+        # else if it's a final node that leads to win or lost - return the score - TODO: might be a problem with values
+        if gameState.isWin() or gameState.isLose():
+            return gameState.getScore()  # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
+            # TODO: maybe we should use Directions.STOP
+        # The recursion
+        current_agent_index = agentIndex
+        if gameState.getNumAgents() == current_agent_index:
+            current_agent_index = 0
+        legal_agent_actions = gameState.getLegalActions(current_agent_index)
+        children_states = [gameState.generateSuccessor(current_agent_index, action) for action in legal_agent_actions]
+
+        if current_agent_index == 0:  # It is pacman's turn - we want to maximize the choice
+            cur_max = float('-inf')
+            for c in children_states:
+                v = self.alphaBetaValue(c, current_agent_index + 1, searchDepth + 1, alpha, beta)
+                cur_max = max(v, cur_max)
+                # Added compared to minimax:
+                alpha = max(cur_max, alpha)
+                if cur_max >= beta:
+                    return float('inf')
+            return cur_max
+        else:  # It is a ghost's turn - we want to minimize the choice
+            cur_min = float('inf')
+            for c in children_states:
+                # Only pacman increases depth because it symbolizes a new iteration on all the agents
+                v = self.alphaBetaValue(c, current_agent_index + 1, searchDepth, alpha, beta)
+                cur_min = min(v, cur_min)
+                # Added compared to minimax:
+                beta = min(cur_min, beta)
+                if cur_min <= alpha:
+                    return float('-inf')
+            return cur_min
 
 
 ######################################################################################
