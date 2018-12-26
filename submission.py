@@ -3,10 +3,9 @@ from collections import deque
 
 from game import Agent
 import math
-import queue
-
 
 #     ********* Reflex agent- sections a and b *********
+from ghostAgents import RandomGhost, DirectionalGhost
 
 
 class ReflexAgent(Agent):
@@ -354,8 +353,51 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
     """
 
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        legal_pacman_actions = gameState.getLegalPacmanActions()
+        expectimax_values = [self.randomExpectimaxValue(gameState.generateSuccessor(0, action), 1, 0) for action in legal_pacman_actions]
+        max_value = max(expectimax_values)
+        bestIndices = [index for index in range(len(expectimax_values)) if expectimax_values[index] == max_value]
+        chosenIndex = random.choice(bestIndices)
+        return legal_pacman_actions[chosenIndex] # Reutrns the expectimax action
         # END_YOUR_CODE
+
+
+    def randomExpectimaxValue(self, gameState, agentIndex, searchDepth):
+
+        # The base cases
+        # if reached self.depth or reached a leaf - stop and return value of heuristic function of state
+        if searchDepth == self.depth or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState) # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
+            # TODO: maybe we should use Directions.STOP
+            # TODO: might be a problem with values
+            # TODO: Change in all of these 3 algorithms that agent+=1 comes right here a few lines down
+        # The recursion
+        current_agent_index = agentIndex
+        if gameState.getNumAgents() == current_agent_index:
+            current_agent_index = 0
+
+        # the randomGhost instance to call getDistribution on. It holds the correct ghost index
+        random_ghost = RandomGhost(current_agent_index)
+
+        legal_agent_actions = gameState.getLegalActions(current_agent_index)
+        children_states = [gameState.generateSuccessor(current_agent_index, action) for action in legal_agent_actions]
+
+        if current_agent_index == 0:  # It is pacman's turn - we want to maximize the choice
+            cur_max = float('-inf')
+            for c in children_states:
+                v = self.randomExpectimaxValue(c, current_agent_index + 1, searchDepth + 1)
+                cur_max = max(v, cur_max)
+            return cur_max
+        else:  # It is a ghost's turn - a probabilistic state
+            sum = 0
+            # get the Counter of probabilities
+            probabilities = random_ghost.getDistribution(gameState)
+            probabilities_keys = list(probabilities.keys())
+            # Computer and return the sum on all the probabilities multiplied by the corresponding randomExpectimaxValue
+            for i in range(len(children_states)):
+                next_key = probabilities_keys[i]
+                sum += probabilities.get(next_key)*self.randomExpectimaxValue(children_states[i], current_agent_index + 1, searchDepth)
+            return sum
 
 
 ######################################################################################
@@ -373,8 +415,53 @@ class DirectionalExpectimaxAgent(MultiAgentSearchAgent):
     """
 
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        legal_pacman_actions = gameState.getLegalPacmanActions()
+        expectimax_values = [self.directionalExpectimaxValue(gameState.generateSuccessor(0, action), 1, 0) for action in
+                             legal_pacman_actions]
+        max_value = max(expectimax_values)
+        bestIndices = [index for index in range(len(expectimax_values)) if expectimax_values[index] == max_value]
+        chosenIndex = random.choice(bestIndices)
+        return legal_pacman_actions[chosenIndex]  # Reutrns the expectimax action
         # END_YOUR_CODE
+
+    def directionalExpectimaxValue(self, gameState, agentIndex, searchDepth):
+
+        # The base cases
+        # if reached self.depth or reached a leaf - stop and return value of heuristic function of state
+        if searchDepth == self.depth or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(
+                gameState)  # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
+            # TODO: maybe we should use Directions.STOP
+            # TODO: might be a problem with values
+            # TODO: Change in all of these 3 algorithms that agent+=1 comes right here a few lines down
+        # The recursion
+        current_agent_index = agentIndex
+        if gameState.getNumAgents() == current_agent_index:
+            current_agent_index = 0
+
+        # the randomGhost instance to call getDistribution on. It holds the correct ghost index
+        directional_ghost = DirectionalGhost(current_agent_index)
+
+        legal_agent_actions = gameState.getLegalActions(current_agent_index)
+        children_states = [gameState.generateSuccessor(current_agent_index, action) for action in legal_agent_actions]
+
+        if current_agent_index == 0:  # It is pacman's turn - we want to maximize the choice
+            cur_max = float('-inf')
+            for c in children_states:
+                v = self.directionalExpectimaxValue(c, current_agent_index + 1, searchDepth + 1)
+                cur_max = max(v, cur_max)
+            return cur_max
+        else:  # It is a ghost's turn - a probabilistic state
+            sum = 0
+            # get the Counter of probabilities
+            probabilities = directional_ghost.getDistribution(gameState)
+            probabilities_keys = list(probabilities.keys())
+            # Computer and return the sum on all the probabilities multiplied by the corresponding randomExpectimaxValue
+            for i in range(len(children_states)):
+                next_key = probabilities_keys[i]
+                sum += probabilities.get(next_key) * self.directionalExpectimaxValue(children_states[i],
+                                                                                current_agent_index + 1, searchDepth)
+            return sum
 
 
 ######################################################################################
