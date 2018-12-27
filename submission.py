@@ -153,12 +153,13 @@ def distance_with_board_constraints(gameState, point):
         for action in actions:
             new_state = next_node_state.generatePacmanSuccessor(action)
 
-            action_already_in_queue = False # TODO: probably remove bc it is only true very rarely and it makes it slow
-            for node in nodes_queue:
-                node_state = node[0]
-                if new_state is node_state:
-                    action_already_in_queue = True
-            if new_state.getPacmanPosition() not in visited and not action_already_in_queue:
+            # action_already_in_queue = False # TODO: probably remove bc it is only true very rarely and it makes it slow
+            # for node in nodes_queue:
+            #     node_state = node[0]
+            #     if new_state is node_state:
+                    # action_already_in_queue = True
+
+            if new_state.getPacmanPosition() not in visited:
                 nodes_queue.appendleft((new_state, curr_dist + 1))
     return 1
 
@@ -245,10 +246,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # if reached self.depth - stop and return value of heuristic function of state
         if (searchDepth == self.depth):
             return self.evaluationFunction(gameState)
-        # else if it's a final node that leads to win or lost - return the score - TODO: might be a problem with values
+        # else if it's a final node that leads to win or lost - return the score
         if gameState.isWin() or gameState.isLose():
-            return gameState.getScore() # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
-                                            # TODO: maybe we should use Directions.STOP
+            return gameState.getScore()
         # The recursion
         current_agent_index = agentIndex
         if gameState.getNumAgents() == current_agent_index:
@@ -304,10 +304,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         # if reached self.depth - stop and return value of heuristic function of state
         if (searchDepth == self.depth):
             return self.evaluationFunction(gameState)
-        # else if it's a final node that leads to win or lost - return the score - TODO: might be a problem with values
+        # else if it's a final node that leads to win or lost - return the score
         if gameState.isWin() or gameState.isLose():
-            return gameState.getScore()  # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
-            # TODO: maybe we should use Directions.STOP
+            return gameState.getScore()
         # The recursion
         current_agent_index = agentIndex
         if gameState.getNumAgents() == current_agent_index:
@@ -367,10 +366,7 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
         # The base cases
         # if reached self.depth or reached a leaf - stop and return value of heuristic function of state
         if searchDepth == self.depth or gameState.isWin() or gameState.isLose():
-            return self.evaluationFunction(gameState) # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
-            # TODO: maybe we should use Directions.STOP
-            # TODO: might be a problem with values
-            # TODO: Change in all of these 3 algorithms that agent+=1 comes right here a few lines down
+            return self.evaluationFunction(gameState)
         # The recursion
         current_agent_index = agentIndex
         if gameState.getNumAgents() == current_agent_index:
@@ -430,10 +426,7 @@ class DirectionalExpectimaxAgent(MultiAgentSearchAgent):
         # if reached self.depth or reached a leaf - stop and return value of heuristic function of state
         if searchDepth == self.depth or gameState.isWin() or gameState.isLose():
             return self.evaluationFunction(
-                gameState)  # TODO: correct? maybe need to change so that isWin returns inf and isLose returns -inf
-            # TODO: maybe we should use Directions.STOP
-            # TODO: might be a problem with values
-            # TODO: Change in all of these 3 algorithms that agent+=1 comes right here a few lines down
+                gameState)
         # The recursion
         current_agent_index = agentIndex
         if gameState.getNumAgents() == current_agent_index:
