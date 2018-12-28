@@ -7,7 +7,7 @@ import math
 #     ********* Reflex agent- sections a and b *********
 from ghostAgents import RandomGhost, DirectionalGhost
 
-class OriginalReflexAgent(Agent): # TODO: See if we need to remove this before submission
+class OriginalReflexAgent(Agent):
     """
     A reflex agent chooses an action at each choice point by examining
     its alternatives via a state evaluation function.
