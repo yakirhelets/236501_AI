@@ -120,7 +120,6 @@ def betterEvaluationFunction(gameState):
     distance_from_closest_ghost = math.inf
 
     for ghost_position in ghost_positions:
-        # TODO: change to improved distance but including all legal actions from ghost, not just ghost's position
         current_distance = util.manhattanDistance(pacman_position, ghost_position)
         if (current_distance < distance_from_closest_ghost):
             distance_from_closest_ghost = current_distance
