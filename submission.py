@@ -144,6 +144,8 @@ def find_distance_to_closest_point_with_food(gameState, dist):
     """
   An implementation of a BFS to return the closest point that has food in it
   """
+    if dist == 7:
+        return 7
 
     visited = set()
     nodes_queue = deque()
@@ -168,30 +170,6 @@ def find_distance_to_closest_point_with_food(gameState, dist):
             # Food will certainly be found because else the game is over with a win
 
     return 0 # At this point game is over with a win
-
-
-# def distance_with_board_constraints(gameState, point):
-#     """
-#     Finds the actual distance between two points considering the walls of the board
-#     """
-#     visited = set()
-#     nodes_queue = deque()
-#     nodes_queue.appendleft((gameState, 0))
-#
-#     while nodes_queue:
-#         next_node_state, curr_dist = nodes_queue.pop()
-#         if next_node_state.getPacmanPosition() == point:
-#             return curr_dist
-#         else:
-#             visited.add(next_node_state.getPacmanPosition())
-#
-#         actions = next_node_state.getLegalPacmanActions()
-#         for action in actions:
-#             new_state = next_node_state.generatePacmanSuccessor(action)
-#
-#             if new_state.getPacmanPosition() not in visited:
-#                 nodes_queue.appendleft((new_state, curr_dist + 1))
-#     return 1
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
 
