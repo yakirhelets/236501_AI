@@ -133,71 +133,65 @@ def betterEvaluationFunction(gameState):
 
     # Sub-Section c in Part B, q1
 
-    closest_point_with_food = find_closest_point_with_food(gameState)
-    distance = distance_with_board_constraints(gameState, closest_point_with_food)
-    score += -(distance)
+    distance_to_closest_point_with_food = find_distance_to_closest_point_with_food(gameState, 0)
+    # distance = distance_with_board_constraints(gameState, closest_point_with_food)
+    score += -(distance_to_closest_point_with_food)
 
     return score
 
 
-def find_closest_point_with_food(gameState):
+def find_distance_to_closest_point_with_food(gameState, dist):
     """
   An implementation of a BFS to return the closest point that has food in it
   """
 
     visited = set()
     nodes_queue = deque()
-    nodes_queue.appendleft(gameState)
+    nodes_queue.appendleft((gameState, dist))
 
     while nodes_queue: # Not empty
-        next_node_state = nodes_queue.pop()
+        next_node_state, current_dist = nodes_queue.pop()
         next_node_position = next_node_state.getPacmanPosition()
         x = next_node_position[0]
         y = next_node_position[1]
         game_food_state = gameState.getFood()
         if game_food_state[x][y]:
-            return next_node_position
+            return current_dist
         else:
             visited.add(next_node_position)
 
         actions = next_node_state.getLegalPacmanActions()
         for action in actions:
             new_state = next_node_state.generatePacmanSuccessor(action)
-            if new_state.getPacmanPosition() not in visited and nodes_queue.count(new_state) == 0:
-                nodes_queue.appendleft(new_state)
+            if new_state.getPacmanPosition() not in visited:
+                nodes_queue.appendleft((new_state, current_dist + 1))
             # Food will certainly be found because else the game is over with a win
 
-    return (0,0) # At this point game is over with a win
+    return 0 # At this point game is over with a win
 
 
-def distance_with_board_constraints(gameState, point):
-    """
-    Finds the actual distance between two points considering the walls of the board
-    """
-    visited = set()
-    nodes_queue = deque()
-    nodes_queue.appendleft((gameState, 0))
-
-    while nodes_queue:
-        next_node_state, curr_dist = nodes_queue.pop()
-        if next_node_state.getPacmanPosition() == point:
-            return curr_dist
-        else:
-            visited.add(next_node_state.getPacmanPosition())
-
-        actions = next_node_state.getLegalPacmanActions()
-        for action in actions:
-            new_state = next_node_state.generatePacmanSuccessor(action)
-
-            # action_already_in_queue = False # TODO: probably remove bc it is only true very rarely and it makes it slow
-            # for node in nodes_queue:
-            #     node_state = node[0]
-            #     if new_state is node_state:
-                    # action_already_in_queue = True
-
-            if new_state.getPacmanPosition() not in visited:
-                nodes_queue.appendleft((new_state, curr_dist + 1))
-    return 1
+# def distance_with_board_constraints(gameState, point):
+#     """
+#     Finds the actual distance between two points considering the walls of the board
+#     """
+#     visited = set()
+#     nodes_queue = deque()
+#     nodes_queue.appendleft((gameState, 0))
+#
+#     while nodes_queue:
+#         next_node_state, curr_dist = nodes_queue.pop()
+#         if next_node_state.getPacmanPosition() == point:
+#             return curr_dist
+#         else:
+#             visited.add(next_node_state.getPacmanPosition())
+#
+#         actions = next_node_state.getLegalPacmanActions()
+#         for action in actions:
+#             new_state = next_node_state.generatePacmanSuccessor(action)
+#
+#             if new_state.getPacmanPosition() not in visited:
+#                 nodes_queue.appendleft((new_state, curr_dist + 1))
+#     return 1
 
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
 
