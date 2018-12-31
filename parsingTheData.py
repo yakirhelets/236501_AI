@@ -10,7 +10,7 @@ layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
            'minimaxClassic', 'openClassic', 'originalClassic',
            'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
 
-with open('results.csv', 'r') as file_ptr:
+with open('experiments.csv', 'r') as file_ptr:
     data = file_ptr.readlines()
     for line in data:
         line_items=line.split(',')

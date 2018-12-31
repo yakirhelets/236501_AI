@@ -110,6 +110,7 @@ def betterEvaluationFunction(gameState):
   """
 
     fear_factor = 3
+    brave_fator = 15
     ghost_proximity_penalty = 1000
 
     score = 0
@@ -118,20 +119,24 @@ def betterEvaluationFunction(gameState):
     pacman_position = gameState.getPacmanPosition()
     ghost_positions = gameState.getGhostPositions()
     distance_from_closest_ghost = math.inf
+    distance_from_far_ghost = -math.inf
 
     for ghost_position in ghost_positions:
         current_distance = util.manhattanDistance(pacman_position, ghost_position)
         if (current_distance < distance_from_closest_ghost):
             distance_from_closest_ghost = current_distance
+        if (current_distance > distance_from_far_ghost):
+            distance_from_far_ghost = current_distance
 
     if (distance_from_closest_ghost < fear_factor):
         score += (distance_from_closest_ghost - ghost_proximity_penalty)
+    if (distance_from_far_ghost > brave_fator):
+        score += (distance_from_closest_ghost + ghost_proximity_penalty//2)
 
     # Sub-Section b in Part B, q1
     score += gameState.getScore()
 
     # Sub-Section c in Part B, q1
-
     distance_to_closest_point_with_food = find_distance_to_closest_point_with_food(gameState, 0)
     # distance = distance_with_board_constraints(gameState, closest_point_with_food)
     score += -(distance_to_closest_point_with_food)
@@ -143,8 +148,7 @@ def find_distance_to_closest_point_with_food(gameState, dist):
     """
   An implementation of a BFS to return the closest point that has food in it
   """
-    if dist == 7:
-        return 7
+    max_dist = 4;
 
     visited = set()
     nodes_queue = deque()
@@ -152,6 +156,11 @@ def find_distance_to_closest_point_with_food(gameState, dist):
 
     while nodes_queue: # Not empty
         next_node_state, current_dist = nodes_queue.pop()
+
+        # Limiting the bfs run to max_dist
+        if current_dist > max_dist:
+            return current_dist
+
         next_node_position = next_node_state.getPacmanPosition()
         x = next_node_position[0]
         y = next_node_position[1]

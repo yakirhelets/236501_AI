@@ -1,21 +1,19 @@
 from layout import getLayout
 from pacman import *
 from ghostAgents import *
-from submission import OriginalReflexAgent, ReflexAgent, MinimaxAgent, AlphaBetaAgent, RandomExpectimaxAgent
+from submission import DirectionalExpectimaxAgent, RandomExpectimaxAgent
 from textDisplay import *
 from multiprocessing import Process, Lock, Pool
 from itertools import product
 import traceback
 
-withDepthplayers = [MinimaxAgent, AlphaBetaAgent, RandomExpectimaxAgent]
-withoutDepthplayers = [OriginalReflexAgent, ReflexAgent]
-depths = [2,3,4]
+withDepthplayers = [DirectionalExpectimaxAgent, RandomExpectimaxAgent]
+withoutDepthplayers = []
+depths = [4]
 
-layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
-           'minimaxClassic', 'openClassic', 'originalClassic',
-           'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
-ghosts = [RandomGhost(1), RandomGhost(2)]
-
+layouts = ['trickyClassic']
+ghosts = [RandomGhost(1)]
+# [DirectionalGhost(1)]
 
 def processesFunction(run):
     # run = player, layout_name, filename, depth=1
@@ -33,7 +31,7 @@ def processesFunction(run):
         player.depth = depth
 
     try:
-        games = runGames(layout, player, ghosts, NullGraphics(), 7, False, 0, False, 30)
+        games = runGames(layout, player, ghosts, NullGraphics(), 1, False, 0, False, 30)
     except: # catch *all* exceptions
         e = sys.exc_info()[0]
         lock.acquire()
@@ -60,7 +58,7 @@ def processesFunction(run):
     # Begin of critical code
     lock.acquire()
     try:
-        with open('experiments.csv', 'a') as file_ptr:
+        with open('part6.csv', 'a') as file_ptr:
             file_ptr.write(line)
         file_ptr.close()
 
@@ -88,7 +86,7 @@ if __name__ == '__main__':
     runsNum = 0
     runs = []
 
-    filename = 'experiments.csv'
+    filename = 'part6.csv'
     if os.path.exists(filename):
         os.remove(filename)
 
@@ -96,17 +94,17 @@ if __name__ == '__main__':
     file_ptr.close()
 
     for layout in layouts:
-        filename = 'results_' + layout + '.csv'
+        filename = 'prt6_' + layout + '.csv'
         if os.path.exists(filename):
             os.remove(filename)
 
     for layout in layouts:
-        filename = 'results_' + layout + '.csv'
+        filename = 'prt6_' + layout + '.csv'
         file_ptr = open(filename, 'w+')
         file_ptr.close()
 
     for layout in layouts:
-        filename = 'results_' + layout + '.csv'
+        filename = 'prt6_' + layout + '.csv'
         for player in withoutDepthplayers:
             runs.append((player(), layout, filename, runsNum))
             runsNum = runsNum + 1
