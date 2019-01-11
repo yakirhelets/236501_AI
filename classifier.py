@@ -1,23 +1,20 @@
-# task 1
+import random
+
 import numpy as np
 import hw3_utils as utils
 
 
+# question 1
 def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
         dist += (x-y)**2
     return np.sqrt(dist)
 
-# TEST FOR TASK 1
-# list1 = [1,2,3,4,5,6,7]
-# list2 = [7,6,5,4,3,2,1]
-#
-# print(euclidian_distance(list1,list2))
 
+# question 2
 
-# task 2
-#The sorting key
+# The sorting key
 def sortByDistance(value):
     return value[2] # Sorting by the 3rd element
 
@@ -66,3 +63,70 @@ class knn_factory(utils.abstract_classifier_factory):
             classifier.append(entry)
         # Return this list, which is the classifier
         return classifier
+
+
+# question 3,1
+
+def create_data_as_list_of_tuples(dataset):
+
+    # Gets raw data and produces a list
+    patients = dataset[0]
+    labels = dataset[1]
+    result = []
+    # Get the data and the labels and create a list where each of its entries is a list with
+    # two elements, the vector and the label
+    for i in range(len(patients)):
+        entry = [patients[i], labels[i]]
+        result.append(entry)
+    return result
+
+def split_crosscheck_groups(dataset, num_folds):
+    '''
+    :param dataset: a list of examples
+    :param num_folds: number of groups to divide to
+    '''
+
+    data_as_list_of_tuples = create_data_as_list_of_tuples(dataset)
+
+    num_of_entries_per_group = int(len(data_as_list_of_tuples) / num_folds)
+
+    shuffled_list = random.sample(data_as_list_of_tuples, k=len(data_as_list_of_tuples))
+    print(shuffled_list[0])
+    # print(shuffled_list)
+    # For each group - add the elements and write to file
+    for i in range(num_folds):
+        file_name = 'ecg_fold_<' + str(i+1) +'>.data'
+        with open(file_name, 'w') as file:
+            for j in range(num_of_entries_per_group):
+                index_of_next_element = (i * num_of_entries_per_group) + j
+                patient_data = "".join(str(shuffled_list[index_of_next_element][0]).splitlines())
+                patient_label = str(shuffled_list[index_of_next_element][1])
+                file.write("%s\n" % patient_data)
+                file.write("%s\n" % patient_label)
+            # print(patient_data)
+
+
+
+def load_k_fold_data(index):
+    '''
+    :param index: the index of the subgroup
+    :return a tuple of train at index i and label at index i
+    '''
+    file_name = 'ecg_fold_<' + str(index) +'>.data'
+    with open(file_name) as file:
+        lines = file.read().splitlines()
+    # lines = [a.strip() for a in file_content]
+
+    patients = []
+    labels = []
+    for i in range(0, len(lines)-1, 2):
+        patients.append(lines[i])
+        labels.append(lines[i+1])
+
+    return (patients, labels)
+
+
+# question 3.2
+
+data = utils.load_data()
+split_crosscheck_groups(data, 2)
