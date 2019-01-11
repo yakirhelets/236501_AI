@@ -91,8 +91,6 @@ def split_crosscheck_groups(dataset, num_folds):
     num_of_entries_per_group = int(len(data_as_list_of_tuples) / num_folds)
 
     shuffled_list = random.sample(data_as_list_of_tuples, k=len(data_as_list_of_tuples))
-    print(shuffled_list[0])
-    # print(shuffled_list)
     # For each group - add the elements and write to file
     for i in range(num_folds):
         file_name = 'ecg_fold_<' + str(i+1) +'>.data'
@@ -103,8 +101,6 @@ def split_crosscheck_groups(dataset, num_folds):
                 patient_label = str(shuffled_list[index_of_next_element][1])
                 file.write("%s\n" % patient_data)
                 file.write("%s\n" % patient_label)
-            # print(patient_data)
-
 
 
 def load_k_fold_data(index):
