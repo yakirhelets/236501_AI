@@ -61,5 +61,3 @@ class abstract_classifier:
         :return: a tagging of the given features (1 or 0)
         '''
         raise Exception('Not implemented')
-
-
