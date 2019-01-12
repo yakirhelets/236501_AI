@@ -5,15 +5,14 @@ import hw3_utils as utils
 
 
 # question 1
-def euclidian_distance(x_list, y_list):
+def euclidean_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
         dist += (x-y)**2
     return math.sqrt(dist)
 
 
-# question 2
-
+# question 2.1
 # The sorting key
 def sortByDistance(value):
     return value[2] # Sorting by the 3rd element
@@ -31,14 +30,15 @@ class knn_classifier(utils.abstract_classifier):
         # Pass the data and the labels to the factory to get a knn_classifier object (map)
         factory = knn_factory()
         knn_classifier = factory.train(data[0], data[1])
-        # For each of the examples, get the ED from features to it using the function and store the resuts
+        # For each of the examples,
+        # get the euclidean distance from features to it using the function and store the results
         data_as_matrix = []
         for i in range(len(knn_classifier)):
-            entry = [knn_classifier[i][0], knn_classifier[i][1], euclidian_distance(features, knn_classifier[i][0])]
+            entry = [knn_classifier[i][0], knn_classifier[i][1], euclidean_distance(features, knn_classifier[i][0])]
             data_as_matrix.append(entry)
 
         # Sort the results
-        data_as_matrix.sort(key = sortByDistance, reverse = True)
+        data_as_matrix.sort(key=sortByDistance, reverse=True)
 
         # Go over the K closest examples and count the number of 1/0
         # for j in range(K):
@@ -46,6 +46,7 @@ class knn_classifier(utils.abstract_classifier):
         # Return the number that has the highest vote among the K
 
 
+# question 2.2
 class knn_factory(utils.abstract_classifier_factory):
     def train(self, data, labels):
         '''
@@ -84,6 +85,7 @@ def split_crosscheck_groups(dataset, num_folds):
     '''
     :param dataset: a list of examples
     :param num_folds: number of groups to divide to
+    :return: num_folds equally sized groups division of the examples
     '''
 
     data_as_list_of_tuples = create_data_as_list_of_tuples(dataset)
@@ -93,7 +95,7 @@ def split_crosscheck_groups(dataset, num_folds):
     shuffled_list = random.sample(data_as_list_of_tuples, k=len(data_as_list_of_tuples))
     # For each group - add the elements and write to file
     for i in range(num_folds):
-        file_name = 'ecg_fold_<' + str(i+1) +'>.data'
+        file_name = 'ecg_fold_' + str(i+1) + '.data'
         with open(file_name, 'w') as file:
             for j in range(num_of_entries_per_group):
                 index_of_next_element = (i * num_of_entries_per_group) + j
@@ -108,7 +110,7 @@ def load_k_fold_data(index):
     :param index: the index of the subgroup
     :return a tuple of train at index i and label at index i
     '''
-    file_name = 'ecg_fold_<' + str(index) +'>.data'
+    file_name = 'ecg_fold_' + str(index) +'.data'
     with open(file_name) as file:
         lines = file.read().splitlines()
     # lines = [a.strip() for a in file_content]
