@@ -1,6 +1,6 @@
+import math
 import random
 
-import numpy as np
 import hw3_utils as utils
 
 
@@ -9,7 +9,7 @@ def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
         dist += (x-y)**2
-    return np.sqrt(dist)
+    return math.sqrt(dist)
 
 
 # question 2
