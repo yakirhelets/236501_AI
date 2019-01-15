@@ -95,10 +95,12 @@ def split_crosscheck_groups(dataset, num_folds):
     list_of_ones = []
 
     for i in range(len(dataset[0])):
-        if (dataset[1][i]) == 0:
-            list_of_zeros.append(dataset[0][i])
+        value_tuple = (dataset[0][i], dataset[1][i])
+
+        if value_tuple[1] == 0:
+            list_of_zeros.append(value_tuple)
         else:
-            list_of_ones.append(dataset[0][i])
+            list_of_ones.append(value_tuple)
 
     # shuffle each group
 
@@ -106,6 +108,7 @@ def split_crosscheck_groups(dataset, num_folds):
     shuffled_list_ones = random.sample(list_of_ones, k=len(list_of_ones))
 
     # for num_folds: take len(0/1) / num_folds into each group (only data[0] and data[1])
+    # TODO: fix indices
     len_of_zeros = len(shuffled_list_zeros) // num_folds
     len_of_ones = len(shuffled_list_ones) // num_folds
 
@@ -120,13 +123,20 @@ def split_crosscheck_groups(dataset, num_folds):
         with open(file_name, 'w') as file:
 
             while zeros_list_index < len_of_zeros * (i+1):
-                patient_data = "".join(str(shuffled_list_zeros[zeros_list_index]).splitlines())
+                patient_data = "".join(str(shuffled_list_zeros[zeros_list_index][0]).splitlines())
                 file.write("%s\n" % patient_data)
+                patient_label = "".join(str(shuffled_list_zeros[zeros_list_index][1]).splitlines())
+                file.write("%s\n" % patient_label)
+
                 zeros_list_index += 1
 
+
             while ones_list_index < len_of_ones * (i+1):
-                patient_data = "".join(str(shuffled_list_ones[ones_list_index]).splitlines())
+                patient_data = "".join(str(shuffled_list_ones[ones_list_index][0]).splitlines())
                 file.write("%s\n" % patient_data)
+                patient_label = "".join(str(shuffled_list_ones[ones_list_index][1]).splitlines())
+                file.write("%s\n" % patient_label)
+
                 ones_list_index += 1
 
 def load_k_fold_data(index):
@@ -156,6 +166,34 @@ def evaluate(classifier_factory, k):
     '''
     # load the training sets
     # load the test set
+
+    accuracy = []
+    error = []
+
+    # go over each of the files that were created (0 to k-1):
+    for i in range(k):
+
+        # Choose the i group as eval
+        file_name = 'ecg_fold_<' + str(i+1) + '>.data'
+        with open(file_name) as file:
+            lines = file.read().splitlines()
+
+            patients = []
+            labels = []
+            for i in range(0, len(lines) - 1, 2):
+                patients.append(lines[i])
+                labels.append(lines[i + 1])
+
+        # put the elements of this group in eval_list and all of the others combined in test_list
+
+        # calculate the accuracy and the errors
+
+    # Return the average of both accuracy of errors
+
+
+
+
+    return math.mean(accuracy), math.mean(error)
 
 
 
