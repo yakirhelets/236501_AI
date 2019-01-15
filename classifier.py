@@ -1,3 +1,4 @@
+import math
 import random
 
 import numpy as np
@@ -20,33 +21,46 @@ def sortByDistance(value):
 
 
 class knn_classifier(utils.abstract_classifier):
+
+    def __init__(self, k_factor, data_list):
+        self.k_factor = k_factor
+        self.data_list = data_list
+
     def classify(self, features):
         '''
         classify a new set of features
         :param features: the list of features to classify
         :return: a tagging of the given features (1 or 0)
         '''
-        # Load the data and the labels with the appropriate function
-        data = utils.load_data()
-        # Pass the data and the labels to the factory to get a knn_classifier object (map)
-        factory = knn_factory()
-        knn_classifier = factory.train(data[0], data[1])
-        # For each of the examples, get the ED from features to it using the function and store the resuts
+        # For each of the examples, get the ED from features to it using the function and store the results
         data_as_matrix = []
-        for i in range(len(knn_classifier)):
-            entry = [knn_classifier[i][0], knn_classifier[i][1], euclidian_distance(features, knn_classifier[i][0])]
+        for i in range(len(self.data_list)):
+            entry = [self.data_list[i][0], self.data_list[i][1], euclidian_distance(features, self.data_list[i][0])]
             data_as_matrix.append(entry)
 
         # Sort the results
         data_as_matrix.sort(key = sortByDistance, reverse = True)
 
-        # Go over the K closest examples and count the number of 1/0
-        # for j in range(K):
-        return (data_as_matrix[0])[2]
-        # Return the number that has the highest vote among the K
+        zeros = 0
+        ones = 0
+        # Go over the K closest examples and count the number of 1's and 0's
+        for j in range(self.k_factor):
+            if (data_as_matrix[j])[1] == 0:
+                zeros += 1
+            else:
+                ones += 1
 
+        # Return the number that has the highest vote among the K
+        if zeros > ones:
+            return 0
+        else:
+            return 1
 
 class knn_factory(utils.abstract_classifier_factory):
+
+    def __init__(self, k_factor):
+        self.k_factor = k_factor
+
     def train(self, data, labels):
         '''
         train a classifier
@@ -55,30 +69,19 @@ class knn_factory(utils.abstract_classifier_factory):
         :return: knn_classifier object
         '''
         # Gets raw data and produces a classifier
-        classifier = []
+        data_list = []
         # Get the data and the labels and create a list where each of its entries is a list with
         # two elements, the vector and the label
         for i in range(len(data)):
             entry = [data[i], labels[i]]
-            classifier.append(entry)
+            data_list.append(entry)
         # Return this list, which is the classifier
+        classifier = knn_classifier(self.k_factor, data_list)
+
         return classifier
 
 
 # question 3,1
-
-def create_data_as_list_of_tuples(dataset):
-
-    # Gets raw data and produces a list
-    patients = dataset[0]
-    labels = dataset[1]
-    result = []
-    # Get the data and the labels and create a list where each of its entries is a list with
-    # two elements, the vector and the label
-    for i in range(len(patients)):
-        entry = [patients[i], labels[i]]
-        result.append(entry)
-    return result
 
 def split_crosscheck_groups(dataset, num_folds):
     '''
@@ -86,22 +89,45 @@ def split_crosscheck_groups(dataset, num_folds):
     :param num_folds: number of groups to divide to
     '''
 
-    data_as_list_of_tuples = create_data_as_list_of_tuples(dataset)
+    # divide the group into 0's and 1's
 
-    num_of_entries_per_group = int(len(data_as_list_of_tuples) / num_folds)
+    list_of_zeros = []
+    list_of_ones = []
 
-    shuffled_list = random.sample(data_as_list_of_tuples, k=len(data_as_list_of_tuples))
+    for i in range(len(dataset[0])):
+        if (dataset[1][i]) == 0:
+            list_of_zeros.append(dataset[0][i])
+        else:
+            list_of_ones.append(dataset[0][i])
+
+    # shuffle each group
+
+    shuffled_list_zeros = random.sample(list_of_zeros, k=len(list_of_zeros))
+    shuffled_list_ones = random.sample(list_of_ones, k=len(list_of_ones))
+
+    # for num_folds: take len(0/1) / num_folds into each group (only data[0] and data[1])
+    len_of_zeros = len(shuffled_list_zeros) // num_folds
+    len_of_ones = len(shuffled_list_ones) // num_folds
+
+    zeros_list_index = 0
+    ones_list_index = 0
+
+
     # For each group - add the elements and write to file
     for i in range(num_folds):
+
         file_name = 'ecg_fold_<' + str(i+1) +'>.data'
         with open(file_name, 'w') as file:
-            for j in range(num_of_entries_per_group):
-                index_of_next_element = (i * num_of_entries_per_group) + j
-                patient_data = "".join(str(shuffled_list[index_of_next_element][0]).splitlines())
-                patient_label = str(shuffled_list[index_of_next_element][1])
-                file.write("%s\n" % patient_data)
-                file.write("%s\n" % patient_label)
 
+            while zeros_list_index < len_of_zeros * (i+1):
+                patient_data = "".join(str(shuffled_list_zeros[zeros_list_index]).splitlines())
+                file.write("%s\n" % patient_data)
+                zeros_list_index += 1
+
+            while ones_list_index < len_of_ones * (i+1):
+                patient_data = "".join(str(shuffled_list_ones[ones_list_index]).splitlines())
+                file.write("%s\n" % patient_data)
+                ones_list_index += 1
 
 def load_k_fold_data(index):
     '''
@@ -120,6 +146,19 @@ def load_k_fold_data(index):
         labels.append(lines[i+1])
 
     return (patients, labels)
+
+# question 4
+def evaluate(classifier_factory, k):
+    '''
+    :param classifier_factory: a classifier factory object
+    :param k: number of folds
+    :return the means of the accuracy and the error
+    '''
+    # load the training sets
+    # load the test set
+
+
+
 
 
 # question 3.2
