@@ -6,7 +6,7 @@ import classifier
 list1 = [1,2,3,4,5,6,7]
 list2 = [7,6,5,4,3,2,1]
 
-print(classifier.euclidian_distance(list1,list2))
+print(classifier.euclidean_distance(list1, list2))
 
 
 # TEST for question 3.2
