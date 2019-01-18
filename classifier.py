@@ -2,7 +2,9 @@ import math
 import pickle
 import random
 
-import numpy as np
+import numpy
+from matplotlib.pyplot import plot
+
 import hw3_utils as utils
 
 
@@ -10,8 +12,10 @@ import hw3_utils as utils
 def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
+        x = x.astype(numpy.float32)
+        y = y.astype(numpy.float32)
         dist += (x-y)**2
-    return math.sqrt(dist)
+    return numpy.sqrt(dist)
 
 
 # question 2
@@ -109,41 +113,32 @@ def split_crosscheck_groups(dataset, num_folds):
     shuffled_list_ones = random.sample(list_of_ones, k=len(list_of_ones))
 
     # for num_folds: take len(0/1) / num_folds into each group (only data[0] and data[1])
-    # TODO: fix indices
+    # TODO: fix indices according to FB?
     len_of_zeros = len(shuffled_list_zeros) // num_folds
     len_of_ones = len(shuffled_list_ones) // num_folds
 
     zeros_list_index = 0
     ones_list_index = 0
 
-
     # For each group - add the elements and write to file
     for i in range(num_folds):
 
-        file_name = 'ecg_fold_<' + str(i+1) +'>.data'
+        file_name = 'ecg_fold_' + str(i+1) +'.data'
 
-        data_to_store = [shuffled_list_zeros, shuffled_list_ones]
+        list_for_numfold_i = []
 
+        while zeros_list_index < len_of_zeros * (i + 1):
+            list_for_numfold_i.append(shuffled_list_zeros[zeros_list_index])
+            zeros_list_index += 1
+
+        while ones_list_index < len_of_ones * (i + 1):
+            list_for_numfold_i.append(shuffled_list_ones[ones_list_index])
+            ones_list_index += 1
+
+        # list_for_numfold_i has all of the values combined - 0's and 1's (the ratio is preserved)
         with open(file_name, 'wb') as file:
-            pickle.dump(data_to_store, file)
-        # with open(file_name, 'w') as file:
-        #
-        #     while zeros_list_index < len_of_zeros * (i+1):
-        #         patient_data = "".join(str(shuffled_list_zeros[zeros_list_index][0]).splitlines())
-        #         file.write("%s\n" % patient_data)
-        #         patient_label = "".join(str(shuffled_list_zeros[zeros_list_index][1]).splitlines())
-        #         file.write("%s\n" % patient_label)
-        #
-        #         zeros_list_index += 1
-        #
-        #
-        #     while ones_list_index < len_of_ones * (i+1):
-        #         patient_data = "".join(str(shuffled_list_ones[ones_list_index][0]).splitlines())
-        #         file.write("%s\n" % patient_data)
-        #         patient_label = "".join(str(shuffled_list_ones[ones_list_index][1]).splitlines())
-        #         file.write("%s\n" % patient_label)
-        #
-        #         ones_list_index += 1
+            pickle.dump(list_for_numfold_i, file)
+
 
 def load_k_fold_data(index):
     '''
@@ -151,23 +146,10 @@ def load_k_fold_data(index):
     :return a tuple of train at index i and label at index i
     '''
 
-    file_name = 'ecg_fold_<' + str(index) +'>.data'
+    file_name = 'ecg_fold_' + str(index) +'.data'
 
     with open(file_name, 'rb') as file:
         return pickle.load(file)
-
-
-    # with open(file_name) as file:
-    #     lines = file.read().splitlines()
-    # # lines = [a.strip() for a in file_content]
-    #
-    # patients = []
-    # labels = []
-    # for i in range(0, len(lines)-1, 2):
-    #     patients.append(lines[i])
-    #     labels.append(lines[i+1])
-    #
-    # return (patients, labels)
 
 # question 4
 def evaluate(classifier_factory, k):
@@ -194,48 +176,20 @@ def evaluate(classifier_factory, k):
         # Choose the i group as eval
         # put the elements of this group in eval_list
 
-        patients_eval, labels_eval = load_k_fold_data(i)
-        for j in range(0, len(patients_eval) - 1):
-            # patients.append(lines[j])
-            # labels.append(lines[j + 1])
-            eval_group_patients.append(patients_eval[j])
-            eval_group_labels.append(labels_eval[j])
-
-
-        # file_name = 'ecg_fold_<' + str(i+1) + '>.data'
-        # with open(file_name) as file:
-        #     lines = file.read().splitlines()
-        #
-        #     patients = []
-        #     labels = []
-        #     for j in range(0, len(lines) - 1, 2):
-        #         # patients.append(lines[j])
-        #         # labels.append(lines[j + 1])
-        #         eval_group.append(lines[j])
-        #         eval_group.append(lines[j + 1])
+        data_from_load_for_eval = load_k_fold_data(i) # A list of tuples for each i index - 0 is the data and 1 is the label
+        for j in range(0, len(data_from_load_for_eval) - 1):
+            eval_group_patients.append(data_from_load_for_eval[j][0])
+            eval_group_labels.append(data_from_load_for_eval[j][1])
 
         # put all of the other elements of all of the combined groups in tests_group
         for l in range(1, k+1):
             if l is not i:
 
-                patients_test, labels_test = load_k_fold_data(l)
-                for m in range(0, len(patients_test) - 1):
-                    # patients.append(lines[j])
-                    # labels.append(lines[j + 1])
-                    test_groups_patients.append(patients_test[m])
-                    test_groups_labels.append(labels_test[m])
+                data_from_load_for_test = load_k_fold_data(l)  # A list of tuples for each i index - 0 is the data and 1 is the label
+                for m in range(0, len(data_from_load_for_test) - 1):
+                    test_groups_patients.append(data_from_load_for_test[m][0])
+                    test_groups_labels.append(data_from_load_for_test[m][1])
 
-                # file_name = 'ecg_fold_<' + str(l+1) + '>.data'
-                # with open(file_name) as file:
-                #     lines = file.read().splitlines()
-                #
-                #     patients = []
-                #     labels = []
-                #     for m in range(0, len(lines) - 1, 2):
-                #         patients.append(lines[m])
-                #         labels.append(lines[m + 1])
-                #         tests_group.append(lines[m])
-                #         tests_group.append(lines[m + 1])
 
         # calculate the accuracy and the errors and add to the accuracy and error lists
 
@@ -259,20 +213,27 @@ def evaluate(classifier_factory, k):
         error.append(curr_error)
 
     # Return the average of both accuracy of errors
-    return math.mean(accuracy), math.mean(error)
+    return numpy.mean(accuracy), numpy.mean(error)
 
-# question 5
+# question 5,1
 patients, labels, test = utils.load_data()
 split_crosscheck_groups([patients, labels], 2)
 
-for k in [1,3,5,7,13]:
-    knn_f = knn_factory(k)
-    accuracy, error = evaluate(knn_f, 2)
+k_list = [1,3,5,7,13]
+accuracy_list = []
 
-    file_name = 'experiments6.csv'
-    with open(file_name, 'wb') as file:
-        line = k + "," + accuracy + "," + error
-        file.write(line + "\n")
+file_name = 'experiments6.csv'
+with open(file_name, 'wb') as file:
+    for k in k_list:
+        knn_f = knn_factory(k)
+        accuracy, error = evaluate(knn_f, 2)
+        line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
+        accuracy_list.append(accuracy)
+        file.write(line.encode())
+print("DONE")
+
+# question 5,2
+plot(k_list, accuracy_list)
 
 
 
