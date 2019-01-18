@@ -1,19 +1,16 @@
-import math
 import pickle
 import random
-
 import numpy
 import matplotlib.pyplot as plt
-
 import hw3_utils as utils
-
+import sklearn
 
 # question 1
 def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
-        x = x.astype(numpy.float32)
-        y = y.astype(numpy.float32)
+        # x = x.astype(numpy.float32)
+        # y = y.astype(numpy.float32)
         dist += (x-y)**2
     return numpy.sqrt(dist)
 
@@ -216,10 +213,14 @@ def evaluate(classifier_factory, k):
     return numpy.mean(accuracy), numpy.mean(error)
 
 
-# question 5,1
+
+# question 3.2
 
 patients, labels, test = utils.load_data()
 split_crosscheck_groups([patients, labels], 2)
+
+
+# question 5,1
 
 k_list = [1,3,5,7,13]
 accuracy_list = []
@@ -238,8 +239,4 @@ plt.plot(k_list, accuracy_list)
 plt.show()
 
 
-
-# question 3.2
-
-# data = utils.load_data()
-# split_crosscheck_groups(data, 2)
+# question 7,1
