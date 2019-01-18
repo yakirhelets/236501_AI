@@ -3,7 +3,7 @@ import pickle
 import random
 
 import numpy
-from matplotlib.pyplot import plot
+import matplotlib.pyplot as plt
 
 import hw3_utils as utils
 
@@ -215,7 +215,9 @@ def evaluate(classifier_factory, k):
     # Return the average of both accuracy of errors
     return numpy.mean(accuracy), numpy.mean(error)
 
+
 # question 5,1
+
 patients, labels, test = utils.load_data()
 split_crosscheck_groups([patients, labels], 2)
 
@@ -230,10 +232,10 @@ with open(file_name, 'wb') as file:
         line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
         accuracy_list.append(accuracy)
         file.write(line.encode())
-print("DONE")
 
 # question 5,2
-plot(k_list, accuracy_list)
+plt.plot(k_list, accuracy_list)
+plt.show()
 
 
 
