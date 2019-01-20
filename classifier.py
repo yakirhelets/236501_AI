@@ -3,14 +3,14 @@ import random
 import numpy
 import matplotlib.pyplot as plt
 import hw3_utils as utils
-import sklearn
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import Perceptron
 
 # question 1
 def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
-        # x = x.astype(numpy.float32)
-        # y = y.astype(numpy.float32)
         dist += (x-y)**2
     return numpy.sqrt(dist)
 
@@ -41,7 +41,7 @@ class knn_classifier(utils.abstract_classifier):
             data_as_matrix.append(entry)
 
         # Sort the results
-        data_as_matrix.sort(key = sortByDistance, reverse = True)
+        data_as_matrix.sort(key = sortByDistance, reverse = False)
 
         zeros = 0
         ones = 0
@@ -62,6 +62,8 @@ class knn_factory(utils.abstract_classifier_factory):
 
     def __init__(self, k_factor):
         self.k_factor = k_factor
+        # self.data = data
+        # self.labels = labels
 
     def train(self, data, labels):
         '''
@@ -78,9 +80,9 @@ class knn_factory(utils.abstract_classifier_factory):
             entry = [data[i], labels[i]]
             data_list.append(entry)
         # Return this list, which is the classifier
-        classifier = knn_classifier(self.k_factor, data_list)
+        result_knn_classifier = knn_classifier(self.k_factor, data_list)
 
-        return classifier
+        return result_knn_classifier
 
 
 # question 3,1
@@ -159,7 +161,7 @@ def evaluate(classifier_factory, k):
     # load the test set
 
     accuracy = []
-    error = []
+    # error = []
 
     # go over each of the files that were created (0 to k-1):
     for i in range(1, k+1):
@@ -190,27 +192,36 @@ def evaluate(classifier_factory, k):
 
         # calculate the accuracy and the errors and add to the accuracy and error lists
 
-        curr_classifier = classifier_factory.train(test_groups_patients, test_groups_labels)
+
+        # if it is not a knn-factory
+        if hasattr(classifier_factory, 'classifier'):
+            curr_classifier = classifier_factory.classifier
+        # else it is a knnfactory
+        else:
+            curr_classifier = classifier_factory.train(test_groups_patients, test_groups_labels)
 
         accuracy_counter = 0
-        error_counter = 0
+        # error_counter = 0
 
         for i in range(len(eval_group_patients)):
             result = curr_classifier.classify(eval_group_patients[i])
             result_from_eval_group = 1 if eval_group_labels[i] == 1 else 0
             if result == result_from_eval_group:
                 accuracy_counter += 1
-            else:
-                error_counter += 1
+            # else:
+            #     error_counter += 1
 
         n = len(eval_group_patients)
         curr_accuracy = accuracy_counter / n
-        curr_error = error_counter / n
+        # curr_error = error_counter / n
         accuracy.append(curr_accuracy)
-        error.append(curr_error)
+        # error.append(curr_error)
+
 
     # Return the average of both accuracy of errors
-    return numpy.mean(accuracy), numpy.mean(error)
+    # return numpy.mean(accuracy), numpy.mean(error)
+    average_accuracy = numpy.mean(accuracy)
+    return average_accuracy, 1-average_accuracy
 
 
 
@@ -229,6 +240,7 @@ file_name = 'experiments6.csv'
 with open(file_name, 'wb') as file:
     for k in k_list:
         knn_f = knn_factory(k)
+        # knn_classifier = knn_f.train()
         accuracy, error = evaluate(knn_f, 2)
         line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
         accuracy_list.append(accuracy)
@@ -236,7 +248,31 @@ with open(file_name, 'wb') as file:
 
 # question 5,2
 plt.plot(k_list, accuracy_list)
+plt.xlabel('K value')
+plt.ylabel('Average accuracy')
+plt.title('Part B, question 5.2')
 plt.show()
 
 
-# question 7,1
+# question 7-1,2
+
+class id3_factory(utils.abstract_classifier_factory):
+
+    def __init__(self):
+        self.classifier = DecisionTreeClassifier(criterion="entropy")
+
+# file_name = 'experiments6.csv'
+# with open(file_name, 'wb') as file:
+    # ID3 RUN
+    # id3_f = id3_factory()
+    # # id3_classifier = id3_f.id3_classifier
+    # # cross_val_score(id3_classifier, )
+    # accuracy, error = evaluate(id3_f, 2)
+    # line = "1" + "," + str(accuracy) + "," + str(error) + "\n"
+    # file.write(line.encode())
+
+    # Perceptron RUN
+    # perceptron_classifier = Perceptron()
+    # accuracy, error = evaluate(perceptron_classifier, 2)
+    # line = "2" + "," + str(accuracy) + "," + str(error) + "\n"
+    # file.write(line.encode())
