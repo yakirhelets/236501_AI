@@ -3,14 +3,13 @@ import random
 import numpy
 import matplotlib.pyplot as plt
 import hw3_utils as utils
-import sklearn
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import Perceptron
 
 # question 1
 def euclidian_distance(x_list, y_list):
     dist = 0
     for x, y in zip(x_list, y_list):
-        # x = x.astype(numpy.float32)
-        # y = y.astype(numpy.float32)
         dist += (x-y)**2
     return numpy.sqrt(dist)
 
@@ -24,9 +23,10 @@ def sortByDistance(value):
 
 class knn_classifier(utils.abstract_classifier):
 
-    def __init__(self, k_factor, data_list):
+    def __init__(self, k_factor, data, labels):
         self.k_factor = k_factor
-        self.data_list = data_list
+        self.data = data
+        self.labels = labels
 
     def classify(self, features):
         '''
@@ -36,12 +36,12 @@ class knn_classifier(utils.abstract_classifier):
         '''
         # For each of the examples, get the ED from features to it using the function and store the results
         data_as_matrix = []
-        for i in range(len(self.data_list)):
-            entry = [self.data_list[i][0], self.data_list[i][1], euclidian_distance(features, self.data_list[i][0])]
+        for i in range(len(self.data)):
+            entry = [self.data[i], self.labels[i], euclidian_distance(features, self.data[i])]
             data_as_matrix.append(entry)
 
         # Sort the results
-        data_as_matrix.sort(key = sortByDistance, reverse = True)
+        data_as_matrix.sort(key = sortByDistance, reverse = False)
 
         zeros = 0
         ones = 0
@@ -62,6 +62,8 @@ class knn_factory(utils.abstract_classifier_factory):
 
     def __init__(self, k_factor):
         self.k_factor = k_factor
+        # self.data = data
+        # self.labels = labels
 
     def train(self, data, labels):
         '''
@@ -70,17 +72,10 @@ class knn_factory(utils.abstract_classifier_factory):
         :param labels: a list that represents the labels that the classifier will be trained with
         :return: knn_classifier object
         '''
-        # Gets raw data and produces a classifier
-        data_list = []
-        # Get the data and the labels and create a list where each of its entries is a list with
-        # two elements, the vector and the label
-        for i in range(len(data)):
-            entry = [data[i], labels[i]]
-            data_list.append(entry)
-        # Return this list, which is the classifier
-        classifier = knn_classifier(self.k_factor, data_list)
+        # No training is occuring here because knn's training is being performed in the classification part
+        result_knn_classifier = knn_classifier(self.k_factor, data, labels)
 
-        return classifier
+        return result_knn_classifier
 
 
 # question 3,1
@@ -159,7 +154,6 @@ def evaluate(classifier_factory, k):
     # load the test set
 
     accuracy = []
-    error = []
 
     # go over each of the files that were created (0 to k-1):
     for i in range(1, k+1):
@@ -189,54 +183,137 @@ def evaluate(classifier_factory, k):
 
 
         # calculate the accuracy and the errors and add to the accuracy and error lists
-
         curr_classifier = classifier_factory.train(test_groups_patients, test_groups_labels)
 
         accuracy_counter = 0
-        error_counter = 0
 
         for i in range(len(eval_group_patients)):
             result = curr_classifier.classify(eval_group_patients[i])
             result_from_eval_group = 1 if eval_group_labels[i] == 1 else 0
             if result == result_from_eval_group:
                 accuracy_counter += 1
-            else:
-                error_counter += 1
 
         n = len(eval_group_patients)
         curr_accuracy = accuracy_counter / n
-        curr_error = error_counter / n
         accuracy.append(curr_accuracy)
-        error.append(curr_error)
+
 
     # Return the average of both accuracy of errors
-    return numpy.mean(accuracy), numpy.mean(error)
+    average_accuracy = numpy.mean(accuracy)
+    return average_accuracy, 1-average_accuracy
 
 
 
 # question 3.2
 
-patients, labels, test = utils.load_data()
-split_crosscheck_groups([patients, labels], 2)
+# patients, labels, test = utils.load_data()
+# split_crosscheck_groups([patients, labels], 2)
 
 
 # question 5,1
 
-k_list = [1,3,5,7,13]
-accuracy_list = []
+# k_list = [1,3,5,7,13]
+# accuracy_list = []
+#
+# file_name = 'experiments6.csv'
+# with open(file_name, 'wb') as file:
+#     for k in k_list:
+#         knn_f = knn_factory(k)
+#         accuracy, error = evaluate(knn_f, 2)
+#         line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
+#         accuracy_list.append(accuracy)
+#         file.write(line.encode())
+#
+# # question 5,2
+# plt.plot(k_list, accuracy_list)
+# plt.xlabel('K value')
+# plt.ylabel('Average accuracy')
+# plt.title('Part B, question 5.2')
+# plt.show()
 
-file_name = 'experiments6.csv'
-with open(file_name, 'wb') as file:
-    for k in k_list:
-        knn_f = knn_factory(k)
-        accuracy, error = evaluate(knn_f, 2)
-        line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
-        accuracy_list.append(accuracy)
-        file.write(line.encode())
 
-# question 5,2
-plt.plot(k_list, accuracy_list)
-plt.show()
+class id3_factory(utils.abstract_classifier_factory):
 
+    def train(self, data, labels):
+        '''
+        train a classifier
+        :param data: a list of lists that represents the features that the classifier will be trained with
+        :param labels: a list that represents the labels that the classifier will be trained with
+        :return: id3_classifier object
+        '''
 
-# question 7,1
+        result_id3_classifier = id3_classifier()
+
+        # Here with ID3, the training is being performed prior to the classification
+        result_id3_classifier.classifier.fit(data, labels)
+
+        return result_id3_classifier
+
+class id3_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = DecisionTreeClassifier(criterion="entropy")
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
+
+class perceptron_factory(utils.abstract_classifier_factory):
+
+    def train(self, data, labels):
+        '''
+        train a classifier
+        :param data: a list of lists that represents the features that the classifier will be trained with
+        :param labels: a list that represents the labels that the classifier will be trained with
+        :return: id3_classifier object
+        '''
+
+        result_perceptron_classifier = perceptron_classifier()
+
+        # Here with ID3, the training is being performed prior to the classification
+        result_perceptron_classifier.classifier.fit(data, labels)
+
+        return result_perceptron_classifier
+
+class perceptron_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = Perceptron()
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
+
+# question 7-1,2
+
+# file_name = 'experiments12.csv'
+# with open(file_name, 'wb') as file:
+#     # ID3 RUN
+#     id3_f = id3_factory()
+#     accuracy, error = evaluate(id3_f, 2)
+#     line = "1" + "," + str(accuracy) + "," + str(error) + "\n"
+#     file.write(line.encode())
+#
+#     # Perceptron RUN
+#     perceptron_f = perceptron_factory()
+#     accuracy, error = evaluate(perceptron_f, 2)
+#     line = "2" + "," + str(accuracy) + "," + str(error) + "\n"
+#     file.write(line.encode())
