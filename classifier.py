@@ -219,7 +219,6 @@ def evaluate(classifier_factory, k):
 # with open(file_name, 'wb') as file:
 #     for k in k_list:
 #         knn_f = knn_factory(k)
-#         # knn_classifier = knn_f.train()
 #         accuracy, error = evaluate(knn_f, 2)
 #         line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
 #         accuracy_list.append(accuracy)
