@@ -62,8 +62,6 @@ class knn_factory(utils.abstract_classifier_factory):
 
     def __init__(self, k_factor):
         self.k_factor = k_factor
-        # self.data = data
-        # self.labels = labels
 
     def train(self, data, labels):
         '''
