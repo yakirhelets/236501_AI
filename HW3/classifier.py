@@ -1,10 +1,10 @@
 import pickle
 import random
 import numpy
-import matplotlib.pyplot as plt
-import hw3_utils as utils
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import Perceptron
+from sklearn.tree import DecisionTreeClassifier
+import hw3_utils as utils
+
 
 # question 1
 def euclidian_distance(x_list, y_list):
@@ -76,7 +76,7 @@ class knn_factory(utils.abstract_classifier_factory):
         return result_knn_classifier
 
 
-# question 3,1
+# question 3.1
 
 def split_crosscheck_groups(dataset, num_folds):
     '''
@@ -201,35 +201,6 @@ def evaluate(classifier_factory, k):
     return average_accuracy, 1-average_accuracy
 
 
-
-# question 3.2
-
-# patients, labels, test = utils.load_data()
-# split_crosscheck_groups([patients, labels], 2)
-
-
-# question 5,1
-
-# k_list = [1,3,5,7,13]
-# accuracy_list = []
-#
-# file_name = 'experiments6.csv'
-# with open(file_name, 'wb') as file:
-#     for k in k_list:
-#         knn_f = knn_factory(k)
-#         accuracy, error = evaluate(knn_f, 2)
-#         line = str(k) + "," + str(accuracy) + "," + str(error) + "\n"
-#         accuracy_list.append(accuracy)
-#         file.write(line.encode())
-#
-# # question 5,2
-# plt.plot(k_list, accuracy_list)
-# plt.xlabel('K value')
-# plt.ylabel('Average accuracy')
-# plt.title('Part B, question 5.2')
-# plt.show()
-
-
 class id3_factory(utils.abstract_classifier_factory):
 
     def train(self, data, labels):
@@ -285,7 +256,7 @@ class perceptron_factory(utils.abstract_classifier_factory):
 class perceptron_classifier(utils.abstract_classifier):
 
     def __init__(self):
-        self.classifier = Perceptron()
+        self.classifier = Perceptron(max_iter=5, tol=None)
 
     def classify(self, features):
         '''
@@ -299,19 +270,3 @@ class perceptron_classifier(utils.abstract_classifier):
             return 1
         else:
             return 0
-
-# question 7-1,2
-
-# file_name = 'experiments12.csv'
-# with open(file_name, 'wb') as file:
-#     # ID3 RUN
-#     id3_f = id3_factory()
-#     accuracy, error = evaluate(id3_f, 2)
-#     line = "1" + "," + str(accuracy) + "," + str(error) + "\n"
-#     file.write(line.encode())
-#
-#     # Perceptron RUN
-#     perceptron_f = perceptron_factory()
-#     accuracy, error = evaluate(perceptron_f, 2)
-#     line = "2" + "," + str(accuracy) + "," + str(error) + "\n"
-#     file.write(line.encode())

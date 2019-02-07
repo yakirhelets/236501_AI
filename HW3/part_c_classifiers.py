@@ -1,109 +1,18 @@
-import random
-import numpy
-import matplotlib.pyplot as plt
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.linear_model import Perceptron
+from sklearn.tree import DecisionTreeClassifier
 import classifier
 import hw3_utils as utils
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import Perceptron
-from classifier import split_crosscheck_groups, evaluate
-from sklearn.ensemble import RandomForestClassifier
 
 
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# --------------------------------------- COMBINED ------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
 
-# TODO: Change names of functions later
-# class classifier_one(utils.abstract_classifier):
-#
-#     def __init__(self, data, labels):
-#         self.data = data
-#         self.labels = labels
-#
-#     def classify(self, features):
-#         split_crosscheck_groups([self.data, self.labels], 10)
-#         k_list = [1,3,5,7,13]
-#         best_k = 0
-#         best_accuracy_value = 0
-#
-#         for k in k_list:
-#             knn_f = knn_factory(k)
-#             accuracy, error = evaluate(knn_f, 10)
-#             if accuracy > best_accuracy_value:
-#                 best_k = k
-#                 best_accuracy_value = accuracy
-#
-#         # Returns a classifier
-#         knn_f = knn_factory(best_k)
-#         result_classifier = knn_f.train(self.data, self.labels)
-#         return result_classifier.classify(features)
-
-
-# TODO: Change names of functions later
-# class classifier_two(utils.abstract_classifier):
-#
-#     def __init__(self, data, labels):
-#         self.data = data
-#         self.labels = labels
-#
-#     def classify(self, features):
-#
-#         num_folds_values_list = [2,3,5,8,10]
-#         k_list = [1,3,5,7,13]
-#
-#         best_k = 0
-#         best_average_accuracy_value = 0
-#
-#         for k in k_list:
-#
-#             accuracy_list_for_k = []
-#
-#             for nf in num_folds_values_list:
-#                 split_crosscheck_groups([self.data, self.labels], nf)
-#                 knn_f = knn_factory(k)
-#                 accuracy, error = evaluate(knn_f, nf)
-#                 accuracy_list_for_k.append(accuracy)
-#
-#             average_accuracy_for_k = numpy.mean(accuracy_list_for_k)
-#
-#             if average_accuracy_for_k > best_average_accuracy_value:
-#                 best_k = k
-#                 best_average_accuracy_value = average_accuracy_for_k
-#
-#         # Returns a classifier
-#         knn_f = knn_factory(best_k)
-#         result_classifier = knn_f.train(self.data, self.labels)
-#         return result_classifier.classify(features)
-
-
-
-# TODO: Change names of functions later
-# ------------------ KNN ENSEMBLE CLASSIFIER -------------------
-# class classifier_three(utils.abstract_classifier):
-#
-#     def __init__(self, data, labels):
-#         self.data = data
-#         self.labels = labels
-#
-#     def classify(self, features):
-#
-#         k_list = [1, 3, 5, 7, 13]
-#
-#         true_counter = 0
-#         false_counte = 0
-#
-#         for k in k_list:
-#             knn_f = knn_factory(k)
-#             knn_classifier = knn_f.train(self.data, self.labels)
-#             result = knn_classifier.classify(features)
-#             if result:
-#                 true_counter += 1
-#             else:
-#                 false_counte += 1
-#
-#         if true_counter > false_counte:
-#             return True
-#         else:
-#             return False
-class id3_factory(utils.abstract_classifier_factory):
+class combined_factory(utils.abstract_classifier_factory):
 
     def train(self, data, labels):
         '''
@@ -113,17 +22,27 @@ class id3_factory(utils.abstract_classifier_factory):
         :return: id3_classifier object
         '''
 
-        result_id3_classifier = id3_classifier()
+        result_knn_classifier = one_nn_classifier(1, data, labels)
+        result_random_forest_clf = random_forest_classifier()
+        result_gaussian_process_clf = gaussian_process_classifier()
 
-        # Here with ID3, the training is being performed prior to the classification
-        result_id3_classifier.classifier.fit(data, labels)
+        result_random_forest_clf.classifier.fit(data, labels)
+        result_gaussian_process_clf.classifier.fit(data, labels)
 
-        return result_id3_classifier
+        combined_clf = combined_classifier((result_knn_classifier, result_random_forest_clf, result_gaussian_process_clf))
 
-class id3_classifier(utils.abstract_classifier):
+        return combined_clf
 
-    def __init__(self):
-        self.classifier = DecisionTreeClassifier(criterion="entropy")
+    def to_string(self):
+        return "Combined Classifier"
+
+class combined_classifier(utils.abstract_classifier):
+
+    def __init__(self, tuple_clfs):
+
+        self.classifier1 = tuple_clfs[0]
+        self.classifier2 = tuple_clfs[1]
+        self.classifier3 = tuple_clfs[2]
 
     def classify(self, features):
         '''
@@ -132,102 +51,57 @@ class id3_classifier(utils.abstract_classifier):
         :return: a tagging of the given features (1 or 0)
         '''
 
-        result = self.classifier.predict(features.reshape(1, -1))
-        if result:
-            return 1
-        else:
-            return 0
+        true_counter = 0
+        false_counter = 0
 
-class perceptron_factory(utils.abstract_classifier_factory):
+        result1 = self.classifier1.classify(features)
+        result2 = self.classifier2.classify(features)
+        result3 = self.classifier3.classify(features)
+
+        results = [result1, result2, result3]
+
+        for r in results:
+            if r:
+                true_counter += 1
+                if true_counter == 2:
+                    return 1
+            else:
+                false_counter += 1
+                if false_counter == 2:
+                    return 0
+
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# ---------------------------------------KNN-------------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+
+class one_nn_factory(utils.abstract_classifier_factory):
 
     def train(self, data, labels):
         '''
         train a classifier
         :param data: a list of lists that represents the features that the classifier will be trained with
         :param labels: a list that represents the labels that the classifier will be trained with
-        :return: id3_classifier object
+        :return: knn_classifier object
         '''
+        # No training is occuring here because knn's training is being performed in the classification part
+        result_knn_classifier = one_nn_classifier(1, data, labels)
 
-        result_perceptron_classifier = perceptron_classifier()
+        return result_knn_classifier
 
-        # Here with ID3, the training is being performed prior to the classification
-        result_perceptron_classifier.classifier.fit(data, labels)
+    def to_string(self):
+        return "1-NN Classifier"
 
-        return result_perceptron_classifier
+class one_nn_classifier(utils.abstract_classifier):
 
-class perceptron_classifier(utils.abstract_classifier):
-
-    def __init__(self):
-        self.classifier = Perceptron()
-
-    def classify(self, features):
-        '''
-        classify a new set of features
-        :param features: the list of features to classify
-        :return: a tagging of the given features (1 or 0)
-        '''
-
-        result = self.classifier.predict(features.reshape(1, -1))
-        if result:
-            return 1
-        else:
-            return 0
-#
-# # TODO: Change names of functions later
-# # ------------------ RANDOM FOREST CLASSIFIER -------------------
-# class classifier_four(utils.abstract_classifier):
-#
-#     def __init__(self, data, labels):
-#         self.data = data
-#         self.labels = labels
-#
-#     def classify(self, features):
-#         classifier = RandomForestClassifier(n_estimators=10) # 10 random classifiers
-#         result_classifier = classifier.fit(self.data, self.labels)
-#         return result_classifier.classify(features)
-
-class random_forest_factory(utils.abstract_classifier_factory):
-
-    def train(self, data, labels):
-        '''
-        train a classifier
-        :param data: a list of lists that represents the features that the classifier will be trained with
-        :param labels: a list that represents the labels that the classifier will be trained with
-        :return: id3_classifier object
-        '''
-
-        random_forest_clf = random_forest_classifier()
-        result_random_forest_classifier = random_forest_clf.fit(self.data, self.labels)
-
-        # Here with ID3, the training is being performed prior to the classification
-        # result_id3_classifier.classifier.fit(data, labels)
-
-        return result_random_forest_classifier
-
-class random_forest_classifier(utils.abstract_classifier):
-
-    def __init__(self):
-        self.classifier = RandomForestClassifier(n_estimators=10) # 10 random classifiers
-
-    def classify(self, features):
-        '''
-        classify a new set of features
-        :param features: the list of features to classify
-        :return: a tagging of the given features (1 or 0)
-        '''
-
-        result = self.classifier.predict(features.reshape(1, -1))
-        if result:
-            return 1
-        else:
-            return 0
-
-class knn_classifier(utils.abstract_classifier):
-
-    def __init__(self, data, labels):
-        self.k_factor = 1
+    def __init__(self, k_factor, data, labels):
+        self.k_factor = k_factor
         self.data = data
         self.labels = labels
+
 
     def classify(self, features):
         '''
@@ -259,7 +133,58 @@ class knn_classifier(utils.abstract_classifier):
         else:
             return 1
 
-class knn_factory(utils.abstract_classifier_factory):
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# ---------------------------------------PERCEPTRON------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+class perceptron_factory(utils.abstract_classifier_factory):
+
+    def train(self, data, labels):
+        '''
+        train a classifier
+        :param data: a list of lists that represents the features that the classifier will be trained with
+        :param labels: a list that represents the labels that the classifier will be trained with
+        :return: id3_classifier object
+        '''
+
+        result_perceptron_classifier = perceptron_classifier()
+
+        result_perceptron_classifier.classifier.fit(data, labels)
+
+        return result_perceptron_classifier
+
+    def to_string(self):
+        return "Perceptron Classifier"
+
+class perceptron_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = Perceptron(max_iter=5, tol=None)
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
+
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# ---------------------------------------GAUSSIAN PROCESS------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+
+class gaussian_process_factory(utils.abstract_classifier_factory):
 
     def train(self, data, labels):
         '''
@@ -268,18 +193,114 @@ class knn_factory(utils.abstract_classifier_factory):
         :param labels: a list that represents the labels that the classifier will be trained with
         :return: knn_classifier object
         '''
-        # No training is occuring here because knn's training is being performed in the classification part
-        result_knn_classifier = knn_classifier(1, data, labels)
+        result_gaussian_process_clf = gaussian_process_classifier()
 
-        return result_knn_classifier
+        result_gaussian_process_clf.classifier.fit(data, labels)
 
-    # לקחת כמה מסווגים ada boost ועוד מסווגים ולממש להם factory וגם classifier ואת train ו-classify בשביל ה-evaluate
-    # לצייר עץ ID3 - יש פונ׳ בילט אין - נותן אינטואיציה
-    # Ada boost - לתכונות - יש סרטון ביוטיוב לראות להבין איך עובד, זה מותאם רק למסווג של adaboost
-    # Ada boost helps understand data about the features
+        return result_gaussian_process_clf
 
-    # kbest = פונ׳ בגוגל - עם פרמטר 40 נגיד, הוא נותן לך את הדיוק עבור 40 התכונות הטובות ביותר.
-    # kbest takes the best already
+    def to_string(self):
+        return "Gaussian Process Classifier"
 
-    # צריך לנרמל משהו גם
-    # knn נרמול - in google - article
+class gaussian_process_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = GaussianProcessClassifier()
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# ---------------------------------------ID3-------------------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+class id3_factory(utils.abstract_classifier_factory):
+
+    def train(self, data, labels):
+        '''
+        train a classifier
+        :param data: a list of lists that represents the features that the classifier will be trained with
+        :param labels: a list that represents the labels that the classifier will be trained with
+        :return: id3_classifier object
+        '''
+
+        result_id3_classifier = id3_classifier()
+
+        # Here with ID3, the training is being performed prior to the classification
+        result_id3_classifier.classifier.fit(data, labels)
+
+        return result_id3_classifier
+
+    def to_string(self):
+        return "ID3 Classifier"
+
+class id3_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = DecisionTreeClassifier(criterion="entropy")
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
+
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+# ---------------------------------------RANDOM FOREST---------------------------------
+# -------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
+
+class random_forest_factory(utils.abstract_classifier_factory):
+
+    def train(self, data, labels):
+        '''
+        train a classifier
+        :param data: a list of lists that represents the features that the classifier will be trained with
+        :param labels: a list that represents the labels that the classifier will be trained with
+        :return: id3_classifier object
+        '''
+
+        result_random_forest_clf = random_forest_classifier()
+        result_random_forest_clf.classifier.fit(data, labels)
+
+        return result_random_forest_clf
+
+    def to_string(self):
+        return "Random Forest Classifier"
+
+class random_forest_classifier(utils.abstract_classifier):
+
+    def __init__(self):
+        self.classifier = RandomForestClassifier(n_estimators=10)  # 10 random classifiers
+
+    def classify(self, features):
+        '''
+        classify a new set of features
+        :param features: the list of features to classify
+        :return: a tagging of the given features (1 or 0)
+        '''
+
+        result = self.classifier.predict(features.reshape(1, -1))
+        if result:
+            return 1
+        else:
+            return 0
