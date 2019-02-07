@@ -1,0 +1,24 @@
+Score as a function of d 
+('OriginalReflexAgent', '1') 76.64200000000001
+('MinimaxAgent', '2') 345.342
+('ReflexAgent', '1') 428.928
+('AlphaBetaAgent', '2') 254.75800000000004
+('RandomExpectimaxAgent', '2') 635.186
+('AlphaBetaAgent', '3') 454.86899999999997
+('MinimaxAgent', '3') 314.043
+('RandomExpectimaxAgent', '3') 641.629
+('MinimaxAgent', '4') 453.02799999999996
+('AlphaBetaAgent', '4') 606.386
+('RandomExpectimaxAgent', '4') 809.7439999999999
+runtime as a function of d 
+('OriginalReflexAgent', '1') 0.00021485599999999998
+('MinimaxAgent', '2') 0.6820428249999999
+('ReflexAgent', '1') 0.00990653
+('AlphaBetaAgent', '2') 0.288215961
+('RandomExpectimaxAgent', '2') 0.6553362549999999
+('AlphaBetaAgent', '3') 1.1848840719999998
+('MinimaxAgent', '3') 1.1681959860000002
+('RandomExpectimaxAgent', '3') 1.111135084
+('MinimaxAgent', '4') 10.343444023
+('AlphaBetaAgent', '4') 3.5572368699999997
+('RandomExpectimaxAgent', '4') 1.376899861
